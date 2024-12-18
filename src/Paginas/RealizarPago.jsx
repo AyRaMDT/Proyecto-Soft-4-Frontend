@@ -27,7 +27,7 @@ const RealizarPago = () => {
 
   const [errors, setErrors] = useState({});
   const toast = useRef(null);
-  const { rowData } = location.state || {};
+  const { rowData } = location.state || {}; 
 
 
   useEffect(() => {
@@ -90,7 +90,7 @@ const RealizarPago = () => {
       formData.numeroPagos,
       parseFloat(formData.cuotaPago) / formData.numeroPagos, // Cuota individual
       parseFloat(formData.saldo)
-    );
+  );
 
     // Validar y limpiar datos
     const formDataToSend = {
@@ -114,48 +114,48 @@ const RealizarPago = () => {
 
   const validarNumeroPagos = (numeroPagos, cuotaPago, saldo) => {
     if (numeroPagos <= 0) {
-      return { esValido: false, mensaje: 'El número de pagos no puede ser negativo o cero.' };
+        return { esValido: false, mensaje: 'El número de pagos no puede ser negativo o cero.' };
     }
 
     const amortizacionTotal = numeroPagos * cuotaPago;
 
     if (amortizacionTotal > saldo) {
-      return { esValido: false, mensaje: 'La amortización total no puede exceder el saldo pendiente.' };
+        return { esValido: false, mensaje: 'La amortización total no puede exceder el saldo pendiente.' };
     }
 
     return { esValido: true };
-  };
+};
 
-  const handleNumeroPagosChange = (e) => {
-    const nuevoNumeroPagos = parseInt(e.target.value, 10) || 1;
+const handleNumeroPagosChange = (e) => {
+  const nuevoNumeroPagos = parseInt(e.target.value, 10) || 1;
 
-    // Validar el nuevo número de pagos usando formData
-    const resultadoValidacion = validarNumeroPagos(
+  // Validar el nuevo número de pagos usando formData
+  const resultadoValidacion = validarNumeroPagos(
       nuevoNumeroPagos,
       parseFloat(formData.cuotaPago) / formData.numeroPagos, // Cuota individual
       parseFloat(prestamo.saldo || 0) // Usa el saldo del préstamo
-    );
+  );
 
-    if (!resultadoValidacion.esValido) {
+  if (!resultadoValidacion.esValido) {
       toast.current.show({
-        severity: 'warn',
-        summary: 'Advertencia',
-        detail: resultadoValidacion.mensaje,
-        life: 3000
+          severity: 'warn',
+          summary: 'Advertencia',
+          detail: resultadoValidacion.mensaje,
+          life: 3000
       });
       return;
-    }
+  }
 
-    // Actualizar el estado con los nuevos valores
-    const nuevaCuotaTotal = parseFloat(formData.cuotaPago) / formData.numeroPagos * nuevoNumeroPagos;
+  // Actualizar el estado con los nuevos valores
+  const nuevaCuotaTotal = parseFloat(formData.cuotaPago) / formData.numeroPagos * nuevoNumeroPagos;
 
-    setFormData((prevState) => ({
+  setFormData((prevState) => ({
       ...prevState,
       numeroPagos: nuevoNumeroPagos,
       cuotaPago: nuevaCuotaTotal.toFixed(2), // Actualiza cuota total
       amortizacion: nuevaCuotaTotal.toFixed(2), // Amortización también
-    }));
-  };
+  }));
+};
 
 
 
@@ -330,18 +330,17 @@ const RealizarPago = () => {
               </div>
 
               <div>
-                <label htmlFor="numeroPagos" className="form-label">Número de Pagos</label>
-                <input
-                  type="number"
-                  id="numeroPagos"
-                  name="numeroPagos"
-                  value={formData.numeroPagos}
-                  min="1"
-                  onChange={handleNumeroPagosChange} // Sin rowData
-                  className="form-input"
-                />
-              </div>
-
+    <label htmlFor="numeroPagos" className="form-label">Número de Pagos</label>
+    <input
+        type="number"
+        id="numeroPagos"
+        name="numeroPagos"
+        value={formData.numeroPagos}
+        min="1"
+        onChange={(e) => handleNumeroPagosChange(e, rowData)}
+        className="form-input"
+    />
+</div>
 
 
 

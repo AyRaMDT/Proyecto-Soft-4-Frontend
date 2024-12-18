@@ -117,52 +117,62 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
       });
       return;
     }
-
+  
     try {
       if (action === "approve") {
-        await aprobarPrestamo(formData.idPrestamoFormal);
-        await agregarFormalizacion({
+        const resultAprobar = await aprobarPrestamo(formData.idPrestamoFormal);
+        const resultAgregar = await agregarFormalizacion({
           analistaIdAnalista: formData.idanalistaCredito,
           analistaPersonaCedula: formData.personaCedula,
           prestamoClienteCuota: formData.prestamoClienteCuota,
           prestamoscliente_idPrestamos: formData.prestamoscliente_idPrestamos,
         });
-
+  
+        console.log("Respuesta del servidor:", resultAgregar);
+  
+        // Manejo de mensajes del servidor
+        if (resultAgregar.message === "El pago ya ha sido registrado.") {
+          toastRef.current.show({
+            severity: "warn",
+            summary: "Advertencia",
+            detail: resultAgregar.message,
+            life: 3000,
+          });
+        } else {
+          toastRef.current.show({
+            severity: "success",
+            summary: "Préstamo Aprobado",
+            detail: "El préstamo fue aprobado y formalizado correctamente.",
+            life: 3000,
+          });
+  
+          setTimeout(() => {
+            window.location.reload();
+          }, 3000);
+        }
+      } else if (action === "reject") {
+        await rechazarPrestamo(formData.idPrestamoFormal);
+  
         toastRef.current.show({
           severity: "success",
           summary: "Préstamo Aprobado",
           detail: "El préstamo fue aprobado y formalizado correctamente.",
-          life: 1000,
-        });
-      } else if (action === "reject") {
-        await rechazarPrestamo(formData.idPrestamoFormal);
-
-        toastRef.current.show({
-          severity: "info",
-          summary: "Préstamo Rechazado",
-          detail: "El préstamo fue rechazado correctamente.",
-          life: 1000,
+          life: 3000,
         });
       }
-
+  
       setIsActionDisabled(true);
-
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
     } catch (error) {
+      console.error("Error al procesar la solicitud:", error);
       toastRef.current.show({
         severity: "error",
         summary: "Error",
         detail: `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo.`,
         life: 3000,
       });
-      console.error(
-        `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo:`,
-        error
-      );
     }
   };
+  
 
   const dialogFooter = (
     <div className="flex justify-content-end">
@@ -192,12 +202,33 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
     >
       <Toast ref={toastRef} />
       <form style={{ display: "grid", gap: "1rem", padding: "1.5rem" }}>
-        <InputText id="idPrestamoFormal" value={formData.idPrestamoFormal} disabled />
-        <InputText id="IdClientes" value={formData.IdClientes} disabled />
-        <InputText id="clientesPersonaCedula" value={formData.clientesPersonaCedula} disabled />
-        <InputText id="idanalistaCredito" value={formData.idanalistaCredito} disabled />
-        <InputText id="personaCedula" value={formData.personaCedula} disabled />
+      <div className="form-group">
+    <label htmlFor="idPrestamoFormal">ID Préstamo Formal</label>
+    <InputText id="idPrestamoFormal" value={formData.idPrestamoFormal} disabled />
+</div>
+
+<div className="form-group">
+    <label htmlFor="IdClientes">ID Cliente</label>
+    <InputText id="IdClientes" value={formData.IdClientes} disabled />
+</div>
+
+<div className="form-group">
+    <label htmlFor="clientesPersonaCedula">Cédula del Cliente</label>
+    <InputText id="clientesPersonaCedula" value={formData.clientesPersonaCedula} disabled />
+</div>
+
+<div className="form-group">
+    <label htmlFor="idanalistaCredito">ID Analista Crédito</label>
+    <InputText id="idanalistaCredito" value={formData.idanalistaCredito} disabled />
+</div>
+
+<div className="form-group">
+    <label htmlFor="personaCedula">Cédula del Análista</label>
+    <InputText id="personaCedula" value={formData.personaCedula} disabled />
+</div>
+
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+        <label htmlFor="prestamoClienteCuota">Cuota del préstamo</label>
           <InputNumber
             id="prestamoClienteCuota"
             value={formData.prestamoClienteCuota}

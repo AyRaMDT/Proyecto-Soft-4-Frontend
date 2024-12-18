@@ -152,6 +152,17 @@
     border-color: #3b82f6;
   }
   
+.btn-pagar{
+    background-color: #359e61 !important;
+    border-color: #0D9488 !important;
+    color: #fff;
+
+  }
+  .btn-pagar:hover {
+    background-color: #225e3be5 !important;
+    border-color: #0F766E !important;
+  }
+  
 
   .btn-edit {
     background-color: #facc15 !important;

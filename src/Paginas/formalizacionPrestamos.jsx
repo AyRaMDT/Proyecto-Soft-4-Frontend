@@ -94,7 +94,7 @@ const PrestamosTable = () => {
     };
 
     const accionesColumnTemplate = (rowData) => {
-        const isDisabled = rowData.estadoPrestamo === "Activo" || rowData.estadoPrestamo === "Rechazado";
+        const isDisabled = rowData.estadoPrestamo === "Activo" || rowData.estadoPrestamo === "Rechazado" || rowData.estadoPrestamo === "Cancelado";
     
         return (
             <div className="actions-container">

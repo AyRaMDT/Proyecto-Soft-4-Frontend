@@ -18,7 +18,7 @@ const AnalistaManagementPage = () => {
     const [filteredAnalistas, setFilteredAnalistas] = useState([]); // Nuevo estado para usuarios filtrados
     const [selectedAnalista, setSelectedAnalista] = useState(null);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(true);
     const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
     const toast = useRef(null);
 
@@ -79,6 +79,7 @@ const AnalistaManagementPage = () => {
                     detail: 'El analista ha sido actualizado.',
                     life: 3000,
                 });
+                window.location.reload(); 
             } else {
                 await insertarAnalista(selectedAnalista); // Enviar en formato JSON
                 toast.current.show({
@@ -87,6 +88,9 @@ const AnalistaManagementPage = () => {
                     detail: 'El analista ha sido agregado exitosamente.',
                     life: 3000,
                 });
+                window.location.reload(); 
+            
+
             }
         } catch (error) {
             console.error('Error in handleSave:', error);
@@ -112,6 +116,7 @@ const AnalistaManagementPage = () => {
                     detail: 'No se proporcionó un ID válido para eliminar.',
                     life: 3000,
                 });
+                window.location.reload(); 
                 return;
             }
 
@@ -122,7 +127,11 @@ const AnalistaManagementPage = () => {
                 summary: 'Analista eliminado',
                 detail: 'El analista ha sido eliminado exitosamente.',
                 life: 3000,
+                
             });
+            window.location.reload(); 
+            
+
 
             const data = await obtenerAnalistas(); // Actualizar la tabla después de eliminar
             setAnalistas(data.analistas || []);
@@ -134,6 +143,9 @@ const AnalistaManagementPage = () => {
                 detail: 'No se pudo eliminar el analista.',
                 life: 3000,
             });
+            window.location.reload(); 
+            
+
         }
     };
 
@@ -258,17 +270,19 @@ const AnalistaManagementPage = () => {
                         <label htmlFor="personaCedula">Número de cédula</label>
                         <InputText
                             id="personaCedula"
-                            value={selectedAnalista?.cedula || ''} // Usa personaCedula directamente
+                            value={selectedAnalista?.personaCedula || selectedAnalista?.cedula || ''} // Handle both modes
                             onChange={(e) =>
                                 setSelectedAnalista((prev) => ({
                                     ...prev,
-                                    personaCedula: e.target.value,
+                                    personaCedula: e.target.value, // Always update personaCedula
                                 }))
                             }
-                            readOnly={isEditing} // Deshabilitar solo en modo edición
-                            placeholder={!isEditing ? 'Ingrese la cédula' : ''} // Mostrar placeholder si es nuevo
+                            readOnly={isEditing} // Only read-only in edit mode
+                            placeholder={!isEditing ? '' : ''} // Show placeholder in add mode
                         />
                     </div>
+
+
 
 
                     <div className="p-field">

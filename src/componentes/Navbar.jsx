@@ -11,6 +11,7 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import RegistrarCliente from "../Modals/RegistrarCliente";
 
+
 const Navbar = ({ role, setRole }) => {
   const [visible, setVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -25,6 +26,7 @@ const Navbar = ({ role, setRole }) => {
       console.error("Error al cerrar sesión:", error);
     }
   };
+
 
   const handleCloseModal = () => {
     setIsModalVisible(false);
@@ -186,13 +188,23 @@ const Navbar = ({ role, setRole }) => {
             </div>
           </Sidebar>
 
-          {/* Modal de registro */}
-          <RegistrarCliente
+
+          {role ? (
+            <Button
+              label="Salir"
+              icon="pi pi-sign-out"
+              onClick={handleLogout}
+              className="barraNavegacion"
+              style={{ marginTop: "10px" }}
+            />
+          ) : (
+            <RegistrarCliente
             visible={isModalVisible}
             onHide={handleCloseModal}
             onRegister={handleRegister}
             className="join-btn"
           />
+          )}
         </div>
       </div>
     </>

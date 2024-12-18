@@ -200,11 +200,6 @@ const PrestamosFormalizadosPage = () => {
                 className="btn-eliminar"
                 onClick={() => handleEliminar(rowData.idPrestamoFormal)}
             />
-            <Button
-                icon="pi pi-info-circle"
-                className="btn-info"
-                onClick={() => openDialog(rowData)}
-            />
         </div>
     );
 
