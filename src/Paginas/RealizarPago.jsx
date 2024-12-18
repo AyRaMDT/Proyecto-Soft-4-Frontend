@@ -34,58 +34,42 @@ const RealizarPago = () => {
         console.log('Prestamo:', prestamo);
 
         if (prestamo.monto && prestamo.PlazoMeses) {
-            const tasaInteresAnual = prestamo.tasaInteresAnual; // Porcentaje anual (ej. 12%)
-            const tasaInteresMoratoria = prestamo.tasaInteresMoratoria; // Porcentaje moratorio
-            const saldo = prestamo.saldo;
-            const diaPagoSeleccionado = parseInt(prestamo.diaPago);
+            const tasaInteresAnual = parseFloat(prestamo.tasaInteresAnual) || 0; // Tasa anual
+            const tasaInteresMoratoria = parseFloat(prestamo.tasaInteresMoratoria) || 0; // Tasa moratoria
+            const saldo = parseFloat(prestamo.saldo) || 0; // Saldo pendiente
+            const diaPagoSeleccionado = parseInt(prestamo.diaPago, 10);
             const diaActual = new Date().getDate();
-            
+
             // Calcular la tasa mensual
             const tasaMensual = (tasaInteresAnual / 100) / 12;
 
-            // Cuota mensual (solo amortización)
-            
-            // Intereses mensuales normales
-            const interesMensual = (saldo * tasaMensual).toFixed(2);
-            
-            // Intereses moratorios (aplicados solo si hay retraso)
+            // Calcular cuota fija usando la fórmula estándar
+            const n = prestamo.PlazoMeses; // Número total de meses
+            const cuotaPago = saldo > 0 && tasaMensual > 0
+                ? parseFloat((saldo * tasaMensual / (1 - Math.pow(1 + tasaMensual, -n))).toFixed(2))
+                : parseFloat((saldo / n).toFixed(2)); // Si no hay tasa, divide el saldo
+
+            // Calcular intereses normales y moratorios
+            const interesMensual = parseFloat((saldo * tasaMensual).toFixed(2)) || 0;
             const interesesMoratorios = diaActual > diaPagoSeleccionado
-            ? (saldo * (tasaInteresMoratoria / 100)).toFixed(2)
+                ? parseFloat((saldo * (tasaInteresMoratoria / 100)).toFixed(2)) || 0
                 : 0;
-                
-                // Total de intereses (mensual + moratorio)
-                const intereses = (
-                  (prestamo.tasaInteresAnual / 100 / 12) + 
-                  (diaActual > diaPagoSeleccionado ? prestamo.tasaInteresMoratoria / 100 : 0)
-                ).toFixed(2);
-                
 
-            const amortizacion = parseFloat((prestamo.monto / prestamo.PlazoMeses).toFixed(2));
+            // Calcular amortización (parte de la cuota fija que paga el capital)
+            const amortizacion = cuotaPago 
 
-            console.log(intereses)
-            // Calcular el interés general sobre la amortización
-            const interesGeneral = parseFloat(amortizacion * intereses);
-
-            // Sumar el interés general a la amortización
-            const cuotaPago = parseFloat((amortizacion + interesGeneral).toFixed(2));
-            
-
-            // Actualizar estado
+            // Actualizar el estado con los valores calculados
             setFormData((prevState) => ({
                 ...prevState,
                 montoPagado: cuotaPago,
-                intereses: intereses * 100, // % intereses mensuales
-                amortizacion: amortizacion,
+                intereses: interesMensual + interesesMoratorios,
+                amortizacion,
                 cuotaPago,
-                idPrestamos: prestamo.idPrestamos
+                idPrestamos: prestamo.idPrestamos,
             }));
 
-            if (diaActual > diaPagoSeleccionado) {
-              setInteresesMoratorios(tasaInteresMoratoria);
-            } else {
-              setInteresesMoratorios(0);
-            }
-            
+            // Actualizar intereses moratorios para visualización
+            setInteresesMoratorios(interesesMoratorios);
         }
     }
 }, [prestamo]);
@@ -266,7 +250,7 @@ const RealizarPago = () => {
                   type="number"
                   id="amortizacion"
                   name="amortizacion"
-                  value={formData.amortizacion}
+                  value={formData.cuotaPago}
                   onChange={handleChange}
                   className="form-input"
                 />

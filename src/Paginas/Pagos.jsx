@@ -25,24 +25,28 @@ const Pagos = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const cargarPagos = async () => {
-            try {
-                setIsLoading(true);
-                setError(null);
-                const data = await obtenerPagos();
-                console.log(data);
-                
-                setPagosData(data.prestamos || []);
-            } catch (err) {
-                setError('No se pudo cargar la lista de pagos.');
-            } finally {
-                setIsLoading(false);
-            }
-        };
+   useEffect(() => {
+    const cargarPagos = async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const data = await obtenerPagos();
+            console.log("Datos recibidos:", data);
 
-        cargarPagos();
-    }, []);
+            // Aplanar el array anidado
+            const pagosAplanados = data.prestamos.flat(); 
+
+            setPagosData(pagosAplanados || []);
+        } catch (err) {
+            setError('No se pudo cargar la lista de pagos.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    cargarPagos();
+}, []);
+
 
     const filteredPagos = useMemo(() => {
         if (!Array.isArray(pagosData)) return [];
@@ -67,9 +71,27 @@ const Pagos = () => {
 
 
     const montoColumnTemplate = (rowData) => {
-        return `$${rowData.monto}`;
+        return `$${rowData.montoPagado}`;
     };
 
+    const fechaColumnTemplate = (rowData) => {
+        if (!rowData.fechaPago) {
+            return 'Fecha inválida'; // Mensaje claro si no hay fecha
+        }
+    
+        try {
+            const fecha = new Date(rowData.fechaPago);
+            if (isNaN(fecha)) {
+                return 'Fecha inválida'; // Si no es una fecha válida
+            }
+            return fecha.toISOString().split('T')[0]; // Retorna "YYYY-MM-DD"
+        } catch (error) {
+            console.error('Error formateando la fecha:', error);
+            return 'Fecha inválida'; // Evitar fallos en el renderizado
+        }
+    };
+    
+    
     const tableHeader = (
         <div className="header-container">
             <div className="search-filters">
@@ -83,7 +105,7 @@ const Pagos = () => {
                     />
                 </div>
 
-                
+
             </div>
         </div>
     );
@@ -103,11 +125,12 @@ const Pagos = () => {
                 responsiveLayout="scroll"
                 className="custom-datatable"
             >
-                <Column field="idPago" header="ID Pago" sortable />
-                <Column field="monto" header="Monto" body={montoColumnTemplate} sortable />
-                <Column field="fechaPago" header="Fecha Pago" sortable />
-                <Column field="metodoPago" header="Método de Pago" sortable />
+                <Column field="idPagos" header="ID Pago" sortable />
+                <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable />
+                <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable />
+                <Column field="medioPago" header="Método de Pago" sortable />
             </DataTable>
+
         </div>
     );
 };
