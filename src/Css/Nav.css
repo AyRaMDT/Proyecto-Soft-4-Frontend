@@ -1,0 +1,43 @@
+.nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    background: white;
+}
+.p-button.p-component{
+    background: #175859; 
+    border: none;
+    transition: background 0.3s ease; 
+}
+
+.p-button.p-component:hover{
+    background: #78cdc4; 
+    border: none !important;
+}
+.pi.pi-lock {
+    left: 12px; 
+    position: relative; 
+    top: 39px; 
+}
+
+.pi.pi-user {
+    left: 12px; 
+    position: relative; 
+    top: 39px; 
+}
+
+.logo {
+    color: #26a69a;
+    font-size: 1.5rem;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: #78909c;
+    text-decoration: none;
+}

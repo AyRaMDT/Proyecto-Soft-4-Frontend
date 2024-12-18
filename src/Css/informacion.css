@@ -1,0 +1,381 @@
+/* Estilos generales de la página */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #e0f8f8; /* Fondo de la página */
+    color: #115e59; /* Color de texto */
+
+}
+
+.container {
+    max-width: 1500px;
+margin: auto;
+    padding: 2rem;
+    text-align: center !important;
+}
+
+/* Encabezado con fondo claro */
+.header {
+    background-color: #b9f5f5; /* Color de fondo del encabezado */
+    border-radius: 1rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    color: #0891b2; /* Color del texto */
+    font-weight: bold;
+}
+
+.header p {
+    font-size: 1.25rem;
+    color: #4b5563; /* Color de texto secundario */
+}
+
+/* Sección de beneficios */
+.benefits {
+    background-color: #0f766e; /* Fondo para los beneficios */
+    padding: 2rem;
+    border-radius: 1rem;
+    margin-top: 2rem;
+}
+
+.benefits h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #ffffff; /* Color blanco para el título */
+    margin-bottom: 1rem;
+}
+
+.benefits ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.benefits ul li {
+    font-size: 1.125rem;
+    color: #ffffff; /* Color blanco para los ítems */
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.benefits ul li::before {
+    content: "✔";
+    color: #22d3ee; /* Color de las marcas de verificación */
+    margin-right: 0.75rem;
+}
+
+/* Fondo degradado en la página */
+.bg-gradient {
+    background: linear-gradient(to bottom right, #22d3ee, #0891b2);
+    padding: 3rem;
+    border-radius: 1rem;
+}
+
+.bg-gradient p {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Estilos responsivos para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .benefits h2 {
+        font-size: 1.5rem;
+    }
+
+    .benefits ul li {
+        font-size: 1rem;
+    }
+}
+/* Estilos para informacion.css */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+
+:root {
+  /* Paleta de colores personalizada */
+  --color-primary: #0891b2;       /* Cyan 600 */
+  --color-primary-light: #22d3ee; /* Cyan 400 */
+  --color-primary-dark: #0e7490;  /* Cyan 700 */
+  --color-background: #f0fdfa;    /* Teal 50 */
+  --color-text-primary: #0f766e;  /* Teal 700 */
+  --color-text-secondary: #115e59; /* Teal 800 */
+  --color-white: #ffffff;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+}
+
+body {
+  font-family: 'Plus Jakarta+Sans', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos de sección principal */
+.main-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-background) 0%, #e6f3f3 100%);
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 2rem; 
+  max-width: 1200px; 
+  margin: 0 auto;
+}
+
+
+.benefits-section {
+  display: block;
+  margin-top: 80px; 
+  background: linear-gradient(to right, var(--color-primary), #14b8a6);
+  color: var(--color-white);
+  border-radius: 1.5rem;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+
+.benefit-item {
+    align-items: center;
+    opacity: 0;
+    animation: fadeInUp 0.5s forwards;
+    margin-bottom: 1.5rem; 
+  }
+
+.motivation-card {
+    background: var(--color-white);
+    border-radius: 1.5rem;
+    box-shadow: 0 15px 30px var(--color-shadow);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.motivation-card:hover {
+    transform: translateY(-15px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+
+
+@media screen and (max-width: 640px) {
+    .grid {
+        grid-template-columns: 1fr; /* 1 columna en móviles */
+        gap: 1rem;
+    }
+
+    .motivation-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Mejoras para iconos */
+.motivation-card svg {
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.motivation-card:hover svg {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Estilos de texto en tarjetas */
+.motivation-card h3 {
+    color: var(--color-primary-dark);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.motivation-card p {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+
+.motivation-card {
+    background: var(--color-white);
+    border-radius: 2rem; /* Aumentado para bordes más redondeados */
+    box-shadow: 0 15px 40px var(--color-shadow);
+    transition: all 0.4s ease-in-out;
+    transform-origin: center;
+    margin-left: auto;
+    margin-right: auto; /* Centrado horizontal */
+    max-width: 350px; /* Ancho más consistente */
+    padding: 2rem;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.motivation-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* Mejoras de responsividad */
+@media screen and (max-width: 1200px) {
+    .motivation-card {
+        margin-left: 0;
+        width: 90%;
+        max-width: 400px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .motivation-card {
+        margin: 20px auto;
+        width: 95%;
+        max-width: 330px;
+        padding: 1.5rem;
+    }
+
+    .iconos {
+        font-size: 3.5rem !important; /* Aumenta el tamaño */
+        width: 3.5rem !important; /* Ajusta el ancho */
+        height: 3.5rem !important; /* Ajusta la altura */
+      }
+      
+}
+
+@media screen and (max-width: 480px) {
+    .motivation-card {
+        width: 100%;
+        margin: 15px auto;
+        padding: 1rem;
+    }
+
+    .motivation-card-icon {
+        font-size: 3rem;
+    }
+}
+
+
+
+/* Estilos de beneficios */
+.benefits-section {
+    margin-top: 80px;
+    background: linear-gradient(to right, var(--color-primary), #14b8a6);
+    color: var(--color-white);
+    border-radius: 1.5rem;
+    display: flex;
+    text-align: center;
+    flex-direction: column; /* Esto hace que los elementos se apilen uno debajo del otro */
+    gap: 1.5rem; /* Espaciado entre los elementos */
+  }
+  
+  /* Los elementos de beneficio */
+ 
+  
+  .benefit-item:nth-child(1) { animation-delay: 0.1s; }
+  .benefit-item:nth-child(2) { animation-delay: 0.2s; }
+  .benefit-item:nth-child(3) { animation-delay: 0.3s; }
+  .benefit-item:nth-child(4) { animation-delay: 0.4s; }
+  .benefit-item:nth-child(5) { animation-delay: 0.5s; }
+  
+  .benefit-icon {
+    margin-right: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  /* Botón de solicitud */
+  .request-button {
+    background: linear-gradient(to right, var(--color-primary), #14b8a6);
+    color: var(--color-white);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .request-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Estilos de inputs */
+  .input-elegant {
+    border: 2px solid var(--color-primary-light);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    background-color: var(--color-white);
+    color: var(--color-text-primary);
+    transition: all 0.3s ease;
+  }
+  
+  .input-elegant:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.2);
+  }
+  
+  /* Efecto de modal */
+  .modal-overlay {
+    margin-top: 20px !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+  }
+
+  span{
+    align-items: center I !important;
+  }
+  
+  .modal-content {
+    margin-top: 20px !important;
+    background: var(--color-white);
+    border-radius: 1.5rem;
+    padding: 2rem;
+    max-width: 90%;
+    width: 500px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+  
+/* Responsividad */
+@media (max-width: 768px) {
+  .motivation-card:hover {
+    transform: none;
+  }
+
+  .benefits-section {
+    grid-template-columns: 1fr;
+  }
+}

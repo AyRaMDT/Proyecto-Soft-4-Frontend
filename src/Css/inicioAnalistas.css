@@ -1,0 +1,88 @@
+/* Fondo general del dashboard */
+.dashboard-container {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 55px;
+  }
+  
+  /* Encabezado */
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #065f46;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-header p {
+    font-size: 1.2rem;
+    color: #047857;
+  }
+  
+  /* Grilla de servicios */
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  /* Tarjetas de servicios */
+  .service-card {
+    background-color: #ffffff;
+    border: 1px solid #a7f3d0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .service-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Estilo del ícono */
+  .icon-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .icon-style {
+    width: 48px;
+    height: 48px;
+    color: #047857;
+  }
+  
+  /* Títulos y descripciones */
+  .service-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #065f46;
+    margin-bottom: 0.5rem;
+  }
+  
+  .service-description {
+    font-size: 1rem;
+    color: #047857;
+    margin-bottom: 1rem;
+  }
+  
+  /* Botón */
+  .custom-button {
+    width: 100%;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+  }
+  

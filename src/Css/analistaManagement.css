@@ -1,0 +1,233 @@
+:root {
+    --primary-color: #14b8a6;
+    --text-color: #0f766e;
+    --background-color: #f0fdfa;
+}
+
+.analista-management-container {
+    min-height: 65vh;
+    max-width: 1500px;
+    margin: 78px auto 85px;
+    padding: 20px;
+    background-color: var(--background-color);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.analista-management-container h1 {
+    font-size: 2rem;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.card {
+    background-color: white;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to right, #14b8a6, #0d9488);
+    color: white;
+    padding: 1.5rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+.card-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.p-button {
+    color: white;
+    background-color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.p-button:hover {
+    background-color: #0d9488;
+    transform: translateY(-2px);
+}
+
+.p-button:active {
+    background-color: #047857;
+    transform: translateY(0);
+}
+
+.p-inputtext {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid var(--primary-color);
+    border-radius: 4px;
+    font-size: 16px;
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.p-inputtext:focus {
+    outline: none;
+    border-color: #00796b;
+    box-shadow: 0 0 5px #40e0d0;
+}
+
+.p-field {
+    margin-bottom: 15px;
+}
+
+.p-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.p-dialog .p-dialog-header {
+    background: linear-gradient(to right, #14b8a6, #0d9488);
+    color: white;
+}
+
+.p-dialog .p-dialog-content {
+    padding: 1.5rem;
+}
+
+.p-datatable-turquoise {
+    font-family: 'Arial', sans-serif;
+    width: 100%;
+    border-radius: 1rem;
+}
+
+.p-datatable-turquoise .p-datatable-header {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.p-datatable-turquoise .p-datatable-thead > tr > th {
+    background-color: #d5e0df !important;
+    color: rgb(0, 0, 0);
+    border: none;
+    font-size: 14px;
+}
+
+.p-datatable-turquoise .p-datatable-tbody > tr:hover {
+    background-color: rgba(20, 184, 166, 0.1);
+}
+
+.p-datatable-turquoise .p-datatable-footer {
+    background-color: var(--background-color);
+}
+
+
+.p-button-turquoise {
+    background-color: #60a5fa;
+    border-color: #60a5fa;
+}
+
+.btn-info {
+    background-color: #60a5fa !important;
+    border-color: #60a5fa !important;
+    color: #fff;
+    border-radius: 50%; 
+    width: 40px; 
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .btn-info:hover {
+    background-color: #3b82f6; 
+    border-color: #3b82f6;
+  }
+  
+
+  .btn-edit {
+    background-color: #facc15 !important;
+    border-color: #facc15 !important;
+    color: #000;
+    border-radius: 50%;
+    width: 40px; 
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .btn-edit:hover {
+    background-color: #eab308; 
+    border-color: #eab308;
+  }
+  
+
+  .btn-delete {
+    background-color: #ef4444 !important; 
+    border-color: #ef4444 !important;
+    color: #fff;
+    border-radius: 50%; 
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+
+.p-button-turquoise:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.btn-container {
+    display: flex;
+    gap: 10px; /* Espaciado entre botones */
+    justify-content: flex-start; /* Alinear los botones a la izquierda (puedes cambiar a center o right según prefieras) */
+    align-items: center; /* Alinear verticalmente los botones */
+}
+
+.btn-eliminar {
+    background-color: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #fff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-eliminar:hover {
+    background-color: #dc2626 !important;
+}
+
+.btn-editar {
+    background-color: #facc15 !important;
+    border-color: #facc15 !important;
+    color: #000 !important;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.btn-editar:hover {
+    background-color: #eab308 !important;
+}

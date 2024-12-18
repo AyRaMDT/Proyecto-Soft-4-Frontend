@@ -1,0 +1,211 @@
+/* Contenedor principal */
+.prestamos-container {
+    max-width: 1600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+.custom-button-success {
+    background-color: #28a745 !important; /* Verde */
+    color: white;
+    border: none;
+}
+
+.custom-button-success:hover {
+    background-color: #218838 !important;
+}
+
+.custom-button-danger {
+    background-color: #dc3545 !important; /* Rojo */
+    color: white;
+    border: none;
+}
+
+.custom-button-danger:hover {
+    background-color: #c82333 !important;
+}
+
+
+.search-input-container {
+    position: relative; /* Para posicionar el ícono dentro del contenedor */
+    display: flex;
+    align-items: center; /* Alineación vertical del ícono y el input */
+    width: 100%; /* Asegura que ocupe todo el espacio disponible */
+    max-width: 300px; /* Tamaño máximo para evitar inputs demasiado largos */
+}
+
+/* Estilo del ícono de búsqueda */
+.search-input-container .pi {
+    position: absolute; /* Posiciona el ícono dentro del contenedor */
+    left: 10px; /* Distancia del ícono al borde izquierdo */
+    font-size: 18px; /* Tamaño del ícono */
+    color: #aaa; /* Color gris suave para el ícono */
+}
+
+/* Estilo del campo de entrada */
+.search-input-container input {
+    width: 100%;
+    /*Aseguraqueelinputocupetodoelespaciodisponible*/padding: 10px 12px;
+    /*Espaciadointerno*/padding-left: 35px;
+    /*Espaciosuficienteparaelícono*/border: 1px solid #ccc;
+    /*Bordeslimpios*/border-radius: 8px;
+    /*Bordesredondeados*/font-size: 14px;
+    /*Tamañodefuentecómodo*/color: #333;
+    /*Colordeltexto*/transition: all 0.3s ease;
+     /* Transición para efectos visuales */
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -o-border-radius: 8px;
+}
+
+/* Efecto al enfocar el campo de entrada */
+.search-input-container input:focus {
+    border-color: #20b8b8; /* Color de borde al enfocar */
+    outline: none; /* Quita el borde predeterminado del navegador */
+    box-shadow: 0 0 5px rgba(32, 184, 184, 0.3); /* Efecto de sombra suave */
+}
+
+/* Encabezado */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-filters {
+    display: flex;
+    gap: 15px;
+    max-height: 70px;
+    
+}
+
+
+
+
+
+
+
+/* Acciones */
+.actions-container {
+    display: flex;
+    gap: 10px;
+}
+
+/* DataTable */
+.custom-datatable .p-datatable-header {
+    background-color: #f4f4f4;
+    border-bottom: 2px solid #20b8b8;
+}
+
+.custom-datatable .p-datatable-thead > tr {
+    background-color: #20b8b8;
+    color: white;
+}
+
+.custom-datatable .p-datatable-thead > tr > th {
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.custom-datatable .p-datatable-tbody > tr:hover {
+    background-color: rgba(32, 184, 184, 0.1);
+}
+
+/* Etiquetas de Estado */
+.p-tag-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+
+.p-tag-warning {
+    background-color: #ffc107 !important;
+    color: black !important;
+}
+
+.p-tag-danger {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.estado-dropdown .p-inputtext {
+    border: none !important; /* Elimina el borde interno */
+    box-shadow: none !important; /* Quita cualquier sombra interna */
+    background-color: transparent !important; /* Fondo transparente */
+}
+/* Contenedor principal del Dropdown */
+.estado-dropdown {
+    width: 100%;
+    max-width: 350px; /* Igual al campo de búsqueda */
+    height: 48px; /* Altura consistente */
+    border-radius: 8px; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Borde limpio y uniforme */
+    font-size: 14px; /* Tamaño de fuente consistente */
+    padding: 0 12px; /* Espaciado interno */
+    margin-top: 1px;
+    box-sizing: border-box;
+    background-color: #ffffff; /* Fondo blanco */
+    display: flex;
+    align-items: center; /* Centra el contenido verticalmente */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transiciones suaves */
+}
+
+/* Efecto al enfocar */
+.estado-dropdown:focus-within {
+    border-color: #20b8b8; /* Borde turquesa */
+    box-shadow: 0 0 5px rgba(32, 184, 184, 0.3); /* Sombra suave */
+}
+
+/* Alineación del icono del Dropdown */
+.estado-dropdown .p-dropdown-trigger {
+    border: none;
+    background-color: transparent;
+    height: 100%; /* Ocupa toda la altura */
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    justify-content: center; /* Centra horizontalmente */
+}
+
+/* Placeholder y texto del Dropdown */
+.estado-dropdown .p-dropdown-label {
+    color: #555; /* Texto en color gris oscuro */
+    font-size: 14px; /* Igual al campo de búsqueda */
+    overflow: hidden; /* Previene que el texto desborde */
+    text-overflow: ellipsis; /* Muestra "..." si el texto es muy largo */
+    white-space: nowrap; /* No permite que el texto haga salto de línea */
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo de la lista desplegable */
+.estado-dropdown .p-dropdown-panel {
+    border-radius: 8px; /* Bordes redondeados */
+    border: 1px solid #ccc; /* Bordes limpios */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    background-color: #ffffff; /* Fondo blanco */
+}
+
+/* Opciones del Dropdown */
+.estado-dropdown .p-dropdown-item {
+    padding: 10px 12px; /* Espaciado interno */
+    font-size: 14px; /* Tamaño de fuente consistente */
+    color: #333; /* Texto oscuro */
+    transition: all 0.2s ease; /* Suaviza la transición */
+}
+
+/* Opciones al pasar el mouse */
+.estado-dropdown .p-dropdown-item:hover {
+    background-color: #20b8b8; /* Fondo turquesa */
+    color: #ffffff; /* Texto blanco */
+}
+
+/* Opción seleccionada */
+.estado-dropdown .p-dropdown-item.p-highlight {
+    background-color: #20b8b8; /* Fondo turquesa */
+    color: #ffffff; /* Texto blanco */
+    font-weight: bold; /* Resalta el texto */
+}
