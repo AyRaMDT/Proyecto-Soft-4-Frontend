@@ -50,7 +50,8 @@ const Prestamos = () => {
         { label: 'Todos los Estados', value: 'TODOS' },
         { label: 'Activo', value: 'Activo' },
         { label: 'Pendiente', value: 'Pendiente' },
-        { label: 'Rechazado', value: 'Rechazado' }
+        { label: 'Rechazado', value: 'Rechazado' },
+        { label: 'Cancelado', value: 'Cancelado' }
     ];
 
     const filteredPrestamos = useMemo(() => {
@@ -114,6 +115,7 @@ const Prestamos = () => {
 
         );
     };
+    
     
 
     const tableHeader = (
