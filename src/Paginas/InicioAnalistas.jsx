@@ -42,7 +42,7 @@ const LoanAnalystDashboard = () => {
       icon: <FileChartLine className="icon-style" />,
       title: "Reportes",
       description: "Consulta de estaditicas segun fechas brindadas, además de su exportación ",
-      route: "/cobro-pagos"
+      route: "/Reportes"
     }
   ];
 

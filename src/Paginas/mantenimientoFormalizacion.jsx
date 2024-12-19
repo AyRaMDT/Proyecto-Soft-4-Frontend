@@ -199,7 +199,7 @@ const PrestamosFormalizadosPage = () => {
                 icon="pi pi-trash"
                 className="btn-eliminar"
                 onClick={() => handleEliminar(rowData.idPrestamoFormal)}
-            />
+            /> 
         </div>
     );
 

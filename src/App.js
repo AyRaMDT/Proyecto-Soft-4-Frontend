@@ -9,10 +9,12 @@ import MantenimientoCliente from './Paginas/mantenimientoClientes';
 import MantenimientoAnalistas from './Paginas/mantenimientoAnalistas';
 import MantenimientoFormalizacion from './Paginas/mantenimientoFormalizacion';
 import Informacion from './Paginas/Informacion';
-import generarPdfFormalizacionPrestamos from './Paginas/pdfFormalizacionPrestamos';
+import PrestamosPorFecha from './Paginas/Prestamoporfecha';
+import Solicitudesporfecha from './Paginas/pdfClientes';
 import CobroPagos from './Paginas/cobroPagos';
 import GestionClientes from './Paginas/mantenimientoClientes';
 import FormalizacionPrestamos from './Paginas/formalizacionPrestamos';
+import Reportes from './Paginas/Reportes';
 import { getProfile } from './api/Login'; 
 import './App.css';
 import 'primereact/resources/primereact.min.css';
@@ -65,9 +67,10 @@ const App = () => {
         <Route path='MisPagos' element={<Pagos/> }/> 
         <Route path="/GestionClientes" element={<GestionClientes />} />
         <Route path="/formalizacionPrestamos" element={<FormalizacionPrestamos />} />
-        <Route path="/pdfFormalizacion" element={<generarPdfFormalizacionPrestamos />} />
+        <Route path="/Prestamoporfecha" element={<PrestamosPorFecha />} />
         <Route path="/cobro-pagos" element={<CobroPagos />} />
-
+        <Route path="/Solicitudesporfecha" element={<Solicitudesporfecha />} />
+        <Route path="/Reportes" element={<Reportes />} />
       </Routes>
       <Footer />
     </Router>

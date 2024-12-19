@@ -126,38 +126,32 @@ const RegistrarCliente = () => {
 
   const handleSubmit = async () => {
     if (!validateForm()) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Errores en el formulario",
+        detail: "Por favor, corrige los errores antes de continuar.",
+      });
       return;
     }
   
-    const clienteNuevo = {
-      nombre: formData.nombre,
-      primerApellido: formData.primerApellido,
-      segundoApellido: formData.segundoApellido,
-      direccion: formData.direccion,
-      telefono: formData.telefono,
-      correoElectronico: formData.correoElectronico,
-      personaCedula: formData.personaCedula,
-      contrasena: formData.contrasena,
-    };
+    const clienteNuevo = { ...formData };
   
     try {
-      console.log("Datos enviados para insertar cliente:", clienteNuevo);
       const response = await insertarCliente(clienteNuevo);
   
-      if (response.error) {
-        toast.current.show({
-          severity: "error",
-          summary: "Error al registrar cliente",
-          detail: response.message || "Hubo un problema al registrar al cliente",
-        });
-      } else {
+      // Log detallado del valor y tipo de `success`
+      console.log("Respuesta completa del backend:", response);
+      console.log("Tipo de `success`:", typeof response.success);
+      console.log("Valor de `success`:", response.success);
+  
+      if (response.success === true) { // Verifica explícitamente si `success` es true
         toast.current.show({
           severity: "success",
           summary: "Registro exitoso",
-          detail: "El cliente se ha registrado correctamente",
+          detail: response.message,
         });
   
-        // Reset the form data and close the dialog
+        // Limpia el formulario
         setFormData({
           personaCedula: "",
           nombre: "",
@@ -168,18 +162,35 @@ const RegistrarCliente = () => {
           correoElectronico: "",
           contrasena: "",
         });
-  
+        setErrors({});
         setVisible(false);
+      } else {
+        // Si `success` no es true, muestra el mensaje de error
+        toast.current.show({
+          severity: "error",
+          summary: "Error al registrar cliente",
+          detail: response.message || "Error desconocido.",
+        });
       }
     } catch (error) {
+      // Manejo de errores generales
+      console.error("Error en la comunicación con el backend:", error);
       toast.current.show({
         severity: "error",
         summary: "Error en la comunicación",
         detail: error.response?.data?.message || "No se pudo conectar con el servidor.",
-        className: "servidor",
       });
     }
   };
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
 
   return (

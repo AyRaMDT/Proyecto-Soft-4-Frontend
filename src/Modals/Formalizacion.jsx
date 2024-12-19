@@ -23,14 +23,12 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
   const [isActionDisabled, setIsActionDisabled] = useState(false);
   const toastRef = useRef(null);
 
-  // Obtener datos del perfil
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const profileResponse = await getProfile();
-        console.log("Respuesta de getProfile:", profileResponse);
-
         const profile = profileResponse.perfil;
+
         setFormData((prevState) => ({
           ...prevState,
           idanalistaCredito: profile.idanalistaCredito || "",
@@ -46,67 +44,24 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
 
   useEffect(() => {
     if (prestamo) {
-        console.log("Datos del préstamo recibidos:", prestamo);
+      const cuota =
+        prestamo.monto && prestamo.PlazoMeses
+          ? (prestamo.monto / prestamo.PlazoMeses).toFixed(2)
+          : null;
 
-        // Cálculo básico de la cuota
-        const cuota =
-            prestamo.monto && prestamo.PlazoMeses
-                ? (prestamo.monto / prestamo.PlazoMeses).toFixed(2)
-                : null;
+      setFormData((prevState) => ({
+        ...prevState,
+        idPrestamoFormal: prestamo.idPrestamos || null,
+        prestamoscliente_idPrestamos: prestamo.idPrestamos || null,
+        IdClientes: prestamo.IdClientes || "",
+        clientesPersonaCedula: prestamo.clientesPersonaCedula || "",
+        prestamoClienteCuota: cuota,
+      }));
 
-        if (prestamo.monto && prestamo.PlazoMeses) {
-            const tasaInteresAnual = prestamo.tasaInteresAnual; // Porcentaje anual
-            const tasaInteresMoratoria = prestamo.tasaInteresMoratoria; // Porcentaje moratorio
-            const saldo = prestamo.saldo;
-            const diaPagoSeleccionado = parseInt(prestamo.diaPago);
-            const diaActual = new Date().getDate();
-
-            // Calcular la tasa mensual
-            const tasaMensual = (tasaInteresAnual / 100) / 12;
-
-            // Intereses mensuales normales
-            const interesMensual = parseFloat((saldo * tasaMensual).toFixed(2));
-
-            // Intereses moratorios (si aplica)
-            const interesesMoratorios = diaActual > diaPagoSeleccionado
-                ? parseFloat((saldo * (tasaInteresMoratoria / 100)).toFixed(2))
-                : 0;
-
-            // Total de intereses (mensual + moratorio)
-            const totalIntereses = interesMensual + interesesMoratorios;
-
-            // Actualizar cuota con intereses
-            const cuotaConIntereses = parseFloat((parseFloat(cuota) + totalIntereses).toFixed(2));
-
-            // Actualizar el estado con los cálculos avanzados
-            setFormData((prevState) => ({
-                ...prevState,
-                idPrestamoFormal: prestamo.idPrestamos || null,
-                prestamoscliente_idPrestamos: prestamo.idPrestamos || null,
-                IdClientes: prestamo.IdClientes || null,
-                clientesPersonaCedula: prestamo.clientesPersonaCedula || "",
-                prestamoClienteCuota: cuotaConIntereses,
-            }));
-        } else {
-            // Actualizar el estado con la cuota básica si no hay cálculos adicionales
-            setFormData((prevState) => ({
-                ...prevState,
-                idPrestamoFormal: prestamo.idPrestamos || null,
-                prestamoscliente_idPrestamos: prestamo.idPrestamos || null,
-                IdClientes: prestamo.IdClientes || null,
-                clientesPersonaCedula: prestamo.clientesPersonaCedula || "",
-                prestamoClienteCuota: cuota,
-            }));
-        }
-
-        setIsActionDisabled(prestamo.estadoPrestamo === "Pendiente");
+      setIsActionDisabled(prestamo.estadoPrestamo === 1 || prestamo.estadoPrestamo === 4);
     }
-}, [prestamo]);
+  }, [prestamo]);
 
-
-
-
-  // Guardar acción
   const handleSave = async () => {
     if (!formData.idPrestamoFormal || !formData.prestamoscliente_idPrestamos) {
       toastRef.current.show({
@@ -117,62 +72,52 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
       });
       return;
     }
-  
+
     try {
       if (action === "approve") {
-        const resultAprobar = await aprobarPrestamo(formData.idPrestamoFormal);
-        const resultAgregar = await agregarFormalizacion({
+        await aprobarPrestamo(formData.idPrestamoFormal);
+        await agregarFormalizacion({
           analistaIdAnalista: formData.idanalistaCredito,
           analistaPersonaCedula: formData.personaCedula,
           prestamoClienteCuota: formData.prestamoClienteCuota,
           prestamoscliente_idPrestamos: formData.prestamoscliente_idPrestamos,
         });
-  
-        console.log("Respuesta del servidor:", resultAgregar);
-  
-        // Manejo de mensajes del servidor
-        if (resultAgregar.message === "El pago ya ha sido registrado.") {
-          toastRef.current.show({
-            severity: "warn",
-            summary: "Advertencia",
-            detail: resultAgregar.message,
-            life: 3000,
-          });
-        } else {
-          toastRef.current.show({
-            severity: "success",
-            summary: "Préstamo Aprobado",
-            detail: "El préstamo fue aprobado y formalizado correctamente.",
-            life: 3000,
-          });
-  
-          setTimeout(() => {
-            window.location.reload();
-          }, 3000);
-        }
-      } else if (action === "reject") {
-        await rechazarPrestamo(formData.idPrestamoFormal);
-  
+
         toastRef.current.show({
           severity: "success",
           summary: "Préstamo Aprobado",
           detail: "El préstamo fue aprobado y formalizado correctamente.",
           life: 3000,
         });
+      } else if (action === "reject") {
+        await rechazarPrestamo(formData.idPrestamoFormal);
+
+        toastRef.current.show({
+          severity: "info",
+          summary: "Préstamo Rechazado",
+          detail: "El préstamo fue rechazado correctamente.",
+          life: 3000,
+        });
       }
-  
+
       setIsActionDisabled(true);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     } catch (error) {
-      console.error("Error al procesar la solicitud:", error);
       toastRef.current.show({
         severity: "error",
         summary: "Error",
         detail: `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo.`,
         life: 3000,
       });
+      console.error(
+        `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo:`,
+        error
+      );
     }
   };
-  
 
   const dialogFooter = (
     <div className="flex justify-content-end">
@@ -181,12 +126,14 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
         icon="pi pi-times"
         onClick={onHide}
         className="p-button-text p-button-secondary mr-2"
+        disabled={isActionDisabled}
       />
       <Button
         label={action === "approve" ? "Aprobar" : "Rechazar"}
         icon={action === "approve" ? "pi pi-check" : "pi pi-times"}
         onClick={handleSave}
         className={action === "approve" ? "p-button-success" : "p-button-danger"}
+        disabled={isActionDisabled}
       />
     </div>
   );
@@ -202,33 +149,24 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
     >
       <Toast ref={toastRef} />
       <form style={{ display: "grid", gap: "1rem", padding: "1.5rem" }}>
-      <div className="form-group">
-    <label htmlFor="idPrestamoFormal">ID Préstamo Formal</label>
-    <InputText id="idPrestamoFormal" value={formData.idPrestamoFormal} disabled />
-</div>
+        <label htmlFor="idPrestamoFormal">ID de Préstamo Formal</label>
+        <InputText id="idPrestamoFormal" value={formData.idPrestamoFormal} disabled />
 
-<div className="form-group">
-    <label htmlFor="IdClientes">ID Cliente</label>
-    <InputText id="IdClientes" value={formData.IdClientes} disabled />
-</div>
+        <label htmlFor="IdClientes">ID de Clientes</label>
+        <InputText id="IdClientes" value={formData.IdClientes} disabled />
 
-<div className="form-group">
-    <label htmlFor="clientesPersonaCedula">Cédula del Cliente</label>
-    <InputText id="clientesPersonaCedula" value={formData.clientesPersonaCedula} disabled />
-</div>
+        <label htmlFor="clientesPersonaCedula">Cédula del Cliente</label>
+        <InputText id="clientesPersonaCedula" value={formData.clientesPersonaCedula} disabled />
 
-<div className="form-group">
-    <label htmlFor="idanalistaCredito">ID Analista Crédito</label>
-    <InputText id="idanalistaCredito" value={formData.idanalistaCredito} disabled />
-</div>
+        <label htmlFor="idanalistaCredito">ID de Analista de Crédito</label>
+        <InputText id="idanalistaCredito" value={formData.idanalistaCredito} disabled />
 
-<div className="form-group">
-    <label htmlFor="personaCedula">Cédula del Análista</label>
-    <InputText id="personaCedula" value={formData.personaCedula} disabled />
-</div>
+        <label htmlFor="personaCedula">Cédula del Analista</label>
+        <InputText id="personaCedula" value={formData.personaCedula} disabled />
 
+        
+        <label htmlFor="prestamoClienteCuota">Cuota del Préstamo</label>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-        <label htmlFor="prestamoClienteCuota">Cuota del préstamo</label>
           <InputNumber
             id="prestamoClienteCuota"
             value={formData.prestamoClienteCuota}
@@ -251,6 +189,7 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
             tooltip={isCuotaEditable ? "Deshabilitar edición" : "Habilitar edición"}
           />
         </div>
+        
       </form>
     </Dialog>
   );

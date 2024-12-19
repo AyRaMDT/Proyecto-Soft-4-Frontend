@@ -53,12 +53,14 @@ const RealizarPagoModal = ({ visible, onHide, rowData }) => {
       if (response.success) {
         showToast('success', 'Éxito', 'Pago realizado correctamente.');
         onHide();
+        window.location.reload(); // Corrige el método de recarga
+
       } else {
         showToast('success', 'Éxito', response.message || 'Pago realizado correctamente.');
+        window.location.reload(); // Corrige el método de recarga
       }
     } catch (error) {
       console.error('Error al realizar el pago:', error);
-      showToast('error', 'Error', 'Hubo un problema al realizar el pago.');
     }
   };
 
