@@ -3,112 +3,94 @@ import axios from 'axios';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { InputText } from 'primereact/inputtext';
-import { Dropdown } from 'primereact/dropdown';
-import { Button } from 'primereact/button';
-import { Tag } from 'primereact/tag';
 import '../Css/mispagos.css';
 
-const obtenerPagos = async () => {
+const obtenerPerfil = async () => {
     try {
-        const response = await axios.get('http://localhost:3333/pagos/listaPagos');
+        const response = await axios.get('http://localhost:3333/auth/profile', { withCredentials: true });
+        console.log('Perfil del usuario logueado:', response.data); // Log del perfil
         return response.data;
     } catch (error) {
-        console.error('Error al obtener la lista de pagos:', error);
-        throw error;
+        console.error('Error al obtener el perfil del usuario:', error);
+        throw new Error('No se pudo obtener el perfil del usuario.');
+    }
+};
+const obtenerPagosPorCliente = async (idCliente) => {
+    try {
+        const response = await axios.get(`http://localhost:3333/pagos/listaPagosporID?idCliente=${idCliente}`);
+        console.log('Pagos obtenidos del API:', response.data); // Log del array anidado
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener los pagos:', error);
+        throw new Error('No se pudo obtener la lista de pagos.');
     }
 };
 
 const Pagos = () => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedEstado, setSelectedEstado] = useState('TODOS');
     const [pagosData, setPagosData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const cargarPagos = async () => {
+        const cargarDatos = async () => {
             try {
                 setIsLoading(true);
                 setError(null);
-                const data = await obtenerPagos();
-                console.log("Datos recibidos:", data);
 
-                // Aplanar el array anidado y filtrar datos válidos
-                const pagosAplanados = data.prestamos.flat().filter((pago) => pago.idPagos && pago.montoPagado);
+                // Obtener perfil del usuario logueado
+                const perfil = await obtenerPerfil();
+                const idCliente = perfil.perfil.idClientes;
 
-                setPagosData(pagosAplanados || []);
+                console.log('ID del cliente logueado:', idCliente);
+
+                // Obtener pagos del cliente logueado
+                const data = await obtenerPagosPorCliente(idCliente);
+
+                // Aplanar el array anidado
+                const pagosAplanados = data.pagos.flatMap((pago) => Array.isArray(pago) ? pago : []);
+                console.log('Pagos procesados (aplanados):', pagosAplanados);
+
+                setPagosData(pagosAplanados);
             } catch (err) {
+                console.error('Error al cargar los datos:', err);
                 setError('No se pudo cargar la lista de pagos.');
             } finally {
                 setIsLoading(false);
             }
         };
 
-        cargarPagos();
+        cargarDatos();
     }, []);
-
 
     const filteredPagos = useMemo(() => {
         if (!Array.isArray(pagosData)) return [];
-        return pagosData.filter(
-            (pago) =>
-                (selectedEstado === 'TODOS' || pago.estadoPago === selectedEstado) &&
-                (searchTerm === '' ||
-                    Object.values(pago).some((valor) =>
-                        String(valor).toLowerCase().includes(searchTerm.toLowerCase())
-                    ))
+        const pagosFiltrados = pagosData.filter((pago) =>
+            searchTerm === '' ||
+            Object.values(pago).some((valor) =>
+                String(valor).toLowerCase().includes(searchTerm.toLowerCase())
+            )
         );
-    }, [pagosData, selectedEstado, searchTerm]);
+        console.log('Pagos filtrados:', pagosFiltrados);
+        return pagosFiltrados;
+    }, [pagosData, searchTerm]);
 
-    // const formatDate = (dateString) => {
-    //     const date = new Date(dateString);
-    //     return date.toISOString().split('T')[0];
-    // };
-
-    // const fechaColumnTemplate = (rowData, field) => {
-    //     return formatDate(rowData[field]);
-    // };
-
-
-    const montoColumnTemplate = (rowData) => {
-        if (rowData.montoPagado == null) {
-            return 'Monto no disponible'; // Mensaje alternativo para valores nulos o undefined
-        }
-        return `$${parseFloat(rowData.montoPagado).toFixed(2)}`; // Asegura que se muestre en formato de moneda
-    };
-
+    const montoColumnTemplate = (rowData) => `$${parseFloat(rowData.montoPagado).toFixed(2)}`;
     const fechaColumnTemplate = (rowData) => {
-        if (!rowData.fechaPago) {
-            return 'Fecha inválida'; // Mensaje claro si no hay fecha
-        }
-
-        try {
-            const fecha = new Date(rowData.fechaPago);
-            if (isNaN(fecha)) {
-                return 'Fecha inválida'; // Si no es una fecha válida
-            }
-            return fecha.toISOString().split('T')[0]; // Retorna "YYYY-MM-DD"
-        } catch (error) {
-            console.error('Error formateando la fecha:', error);
-            return 'Fecha inválida'; // Evitar fallos en el renderizado
-        }
+        if (!rowData.fechaPago) return 'Fecha inválida';
+        const fecha = new Date(rowData.fechaPago);
+        return fecha.toISOString().split('T')[0];
     };
-
 
     const tableHeader = (
         <div className="header-container">
-            <div className="search-filters">
-                <div className="search-input-container">
-                    <i className="pi pi-search" />
-                    <InputText
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        placeholder="Buscar pagos"
-                        className="search-input"
-                    />
-                </div>
-
-
+            <div className="search-input-container">
+                <i className="pi pi-search" />
+                <InputText
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Buscar pagos"
+                />
             </div>
         </div>
     );
@@ -126,19 +108,21 @@ const Pagos = () => {
                 paginator
                 rows={5}
                 responsiveLayout="scroll"
+                emptyMessage={
+                    <div style={{ textAlign: 'center', padding: '10px', fontSize: '1.2em', color: '#555' }}>
+                        <strong>No se encontraron pagos.</strong>
+                    </div>
+                }
                 className="custom-datatable"
-                tableStyle={{ margin: '0 auto' }} /* Centra la tabla */
+                
             >
-                <Column field="idPagos" header="ID Pago" sortable style={{ width: '15%' }} />
-                <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable style={{ width: '20%' }} />
-                <Column field="amortizacion" header="Amortizacion" sortable style={{ width: '20%' }} />
-                <Column field="numeroPagos" header="# de Pagos" sortable style={{ width: '20%' }} />
-                <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable style={{ width: '25%' }} />
-                <Column field="medioPago" header="Método de Pago" sortable style={{ width: '20%' }} />
+                <Column field="idPagos" header="ID Pago" sortable />
+                <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable />
+                <Column field="amortizacion" header="Amortización" sortable />
+                <Column field="numeroPagos" header="# de Pagos" sortable />
+                <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable />
+                <Column field="medioPago" header="Método de Pago" sortable />
             </DataTable>
-
-
-
         </div>
     );
 };

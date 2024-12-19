@@ -338,7 +338,6 @@ const AnalistaManagementPage = () => {
                                 }))
                             }
                             onInput={(e) => validateCedula(e.target.value)}
-                            placeholder={isEditing ? selectedAnalista?.cedula || '' : ''}
                         />
                         {errors.cedula && (
                             <small className="p-error">{errors.personaCedula}</small>

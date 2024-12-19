@@ -9,9 +9,12 @@ import { Tag } from 'primereact/tag';
 import '../Css/formalizacion.css';
 import { useNavigate } from 'react-router-dom';
 
-const obtenerPrestamos = async () => {
+// Obtener los préstamos de un cliente
+const obtenerPrestamosPorCliente = async (idCliente) => {
     try {
-        const response = await axios.get('http://localhost:3333/prestamos/listaPrestamos');
+        console.log(`Obteniendo préstamos para el cliente con ID: ${idCliente}`);
+        const response = await axios.get(`http://localhost:3333/prestamos/listarID?idCliente=${idCliente}`);
+        console.log('Respuesta de préstamos:', response.data);
         return response.data;
     } catch (error) {
         console.error('Error al obtener la lista de préstamos:', error);
@@ -19,23 +22,67 @@ const obtenerPrestamos = async () => {
     }
 };
 
+// Obtener perfil del usuario logueado
+const getProfile = async () => {
+    try {
+        console.log('Obteniendo perfil del usuario...');
+        const response = await axios.get("http://localhost:3333/auth/profile", {
+            withCredentials: true,
+        });
+        console.log('Perfil del usuario obtenido:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+        throw new Error("No se pudo obtener el perfil del usuario");
+    }
+};
 const Prestamos = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedEstado, setSelectedEstado] = useState('TODOS');
     const [prestamosData, setPrestamosData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [idCliente, setIdCliente] = useState(null);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const profileResponse = await getProfile();
+                const profile = profileResponse.perfil;
+
+                console.log('Usuario logueado:', profile);
+                setIdCliente(profile.idClientes || null);
+            } catch (error) {
+                console.error('Error al obtener los datos del usuario logueado:', error);
+                setError('No se pudo obtener el perfil del usuario logueado.');
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     useEffect(() => {
+        if (!idCliente) return;
+
         const cargarPrestamos = async () => {
             try {
+                console.log('Cargando préstamos para el cliente:', idCliente);
                 setIsLoading(true);
                 setError(null);
-                const data = await obtenerPrestamos();
-                setPrestamosData(data.prestamos[0] || []);
+
+                const data = await obtenerPrestamosPorCliente(idCliente);
+
+                // Accede correctamente al array de préstamos en el índice 0
+                const prestamosArray =
+                    Array.isArray(data.prestamos) && Array.isArray(data.prestamos[0])
+                        ? data.prestamos[0]
+                        : [];
+                console.log('Préstamos cargados desde índice 0:', prestamosArray);
+
+                setPrestamosData(prestamosArray);
             } catch (err) {
+                console.error('Error al cargar los préstamos:', err);
                 setError('No se pudo cargar la lista de préstamos.');
             } finally {
                 setIsLoading(false);
@@ -43,18 +90,22 @@ const Prestamos = () => {
         };
 
         cargarPrestamos();
-    }, []);
-
+    }, [idCliente]);
 
     const estadoDropdownOptions = [
         { label: 'Todos los Estados', value: 'TODOS' },
         { label: 'Activo', value: 'Activo' },
         { label: 'Pendiente', value: 'Pendiente' },
         { label: 'Rechazado', value: 'Rechazado' },
-        { label: 'Cancelado', value: 'Cancelado' }
+        { label: 'Cancelado', value: 'Cancelado' },
     ];
 
     const filteredPrestamos = useMemo(() => {
+        console.log('Filtrando préstamos con los siguientes criterios:', {
+            searchTerm,
+            selectedEstado,
+            prestamosData,
+        });
         if (!Array.isArray(prestamosData)) return [];
         return prestamosData.filter(
             (prestamo) =>
@@ -72,51 +123,42 @@ const Prestamos = () => {
     };
 
     const fechaColumnTemplate = (rowData, field) => {
-        return formatDate(rowData[field]);
+        const dateValue = rowData[field];
+        return dateValue ? formatDate(dateValue) : 'N/A';
     };
 
     const estadoTagTemplate = (rowData) => {
+        const estado = rowData.estadoPrestamo || 'Desconocido';
         const severity = {
             'Activo': 'success',
             'Pendiente': 'warning',
-            'Rechazado': 'danger'
+            'Rechazado': 'danger',
+            'Cancelado': 'info',
         };
-        return <Tag severity={severity[rowData.estadoPrestamo] || 'info'} value={rowData.estadoPrestamo} />;
-    };
-
-    const montoColumnTemplate = (rowData) => {
-        return (rowData.monto);
+        return <Tag severity={severity[estado] || 'info'} value={estado} />;
     };
 
     const accionesColumnTemplate = (rowData) => {
-        // const isDisabled = rowData.estadoPrestamo === "Activo" || rowData.estadoPrestamo === "Rechazado";
-    
+        const isPagarDisponible = rowData.estadoPrestamo?.match(/^Activo$/);
         return (
             <div className="actions-container">
-    <Button
-        icon={rowData.estadoPrestamo?.match(/^Activo$/) ? "pi pi-check" : "pi pi-ban"}
-        className={`p-button-rounded ${
-            rowData.estadoPrestamo?.match(/^Activo$/)
-                ? "custom-button-success"
-                : "custom-button-danger"
-        }`}
-        tooltip={
-            rowData.estadoPrestamo?.match(/^Activo$/)
-                ? "Pagar"
-                : "No disponible para pagar"
-        }
-        onClick={() => 
-            rowData.estadoPrestamo?.match(/^Activo$/) &&
-            navigate('/RealizarPago', { state: { rowData } })
-        }
-        disabled={!rowData.estadoPrestamo?.match(/^Activo$/)}
-    />
-</div>
-
+                <Button
+                    icon={isPagarDisponible ? "pi pi-check" : "pi pi-ban"}
+                    className={`p-button-rounded ${isPagarDisponible ? "custom-button-success" : "custom-button-danger"
+                        }`}
+                    tooltip={isPagarDisponible ? "Pagar" : "No disponible para pagar"}
+                    onClick={() =>
+                        isPagarDisponible &&
+                        navigate('/RealizarPago', { state: { rowData } })
+                    }
+                    disabled={!isPagarDisponible}
+                />
+            </div>
         );
     };
-    
-    
+
+    if (isLoading) return <p>Cargando datos...</p>;
+    if (error) return <p className="error-message">{error}</p>;
 
     const tableHeader = (
         <div className="header-container">
@@ -142,9 +184,6 @@ const Prestamos = () => {
         </div>
     );
 
-    if (isLoading) return <p>Cargando datos...</p>;
-    if (error) return <p className="error-message">{error}</p>;
-
     return (
         <div className="prestamos-container">
             <DataTable
@@ -155,11 +194,16 @@ const Prestamos = () => {
                 paginator
                 rows={5}
                 responsiveLayout="scroll"
+                emptyMessage={
+                    <div style={{ textAlign: 'center', padding: '10px', fontSize: '1.2em', color: '#555' }}>
+                        <strong>No se encontraron préstamos.</strong>
+                    </div>
+                }
                 className="custom-datatable"
             >
                 <Column field="idPrestamos" header="ID" sortable />
                 <Column field="numeroPrestamo" header="Número Préstamo" />
-                <Column field="monto" header="Monto" body={montoColumnTemplate} sortable />
+                <Column field="monto" header="Monto" sortable />
                 <Column field="PlazoMeses" header="Plazo (Meses)" sortable />
                 <Column field="fechaInicio" header="Fecha Inicio" body={(rowData) => fechaColumnTemplate(rowData, 'fechaInicio')} sortable />
                 <Column field="tasaInteresMoratoria" header="Tasa Mora (%)" sortable />
@@ -170,7 +214,7 @@ const Prestamos = () => {
                 <Column header="Acciones" body={accionesColumnTemplate} />
             </DataTable>
 
-            
+
         </div>
     );
 };
