@@ -1,0 +1,83 @@
+
+.pagos-container {
+    padding: 1.5rem; /* Reduce el padding general */
+    background-color: #ffffff; /* Fondo blanco limpio */
+    border-radius: 8px; /* Bordes ligeramente redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    max-width: 90%; /* Ancho máximo para limitar el espacio */
+    margin: 0 auto; /* Centra el contenedor */
+    margin-top: 100px;
+    margin-bottom: 150px;
+}
+
+.custom-datatable {
+    border-radius: 8px; /* Bordes redondeados para la tabla */
+    overflow: hidden; /* Evita que sobresalga contenido */
+    width: 100%; /* Asegura que ocupe todo el ancho del contenedor */
+}
+
+.p-datatable-header {
+
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.75rem; /* Ajusta el padding */
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+
+    color: rgb(0, 0, 0);
+    text-align: center;
+    padding: 0.75rem; /* Reduce padding */
+    font-size: 1rem; /* Tamaño de fuente moderado */
+}
+
+.p-datatable .p-datatable-tbody > tr {
+    background-color: #fff;
+    transition: background-color 0.3s;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+    background-color: #f1f8fc; /* Color suave en hover */
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+    text-align: center;
+    padding: 0.5rem; /* Reduce el padding interno */
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.p-datatable .p-datatable-footer {
+    background-color: #f9f9f9;
+    text-align: center;
+    padding: 0.75rem;
+}
+
+.search-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centra el buscador */
+    margin-bottom: 1rem;
+}
+
+
+.search-input:focus {
+    border-color: #40e0d0;
+    box-shadow: 0 0 5px rgba(64, 224, 208, 0.5);
+}
+
+.paginator {
+    justify-content: center; /* Centra el paginador */
+    margin-top: 1rem;
+}
+
+.error-message {
+    color: #d32f2f;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}

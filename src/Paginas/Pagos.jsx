@@ -6,7 +6,7 @@ import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { Tag } from 'primereact/tag';
-import '../Css/formalizacion.css';
+import '../Css/mispagos.css';
 
 const obtenerPagos = async () => {
     try {
@@ -25,27 +25,27 @@ const Pagos = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
-   useEffect(() => {
-    const cargarPagos = async () => {
-        try {
-            setIsLoading(true);
-            setError(null);
-            const data = await obtenerPagos();
-            console.log("Datos recibidos:", data);
+    useEffect(() => {
+        const cargarPagos = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                const data = await obtenerPagos();
+                console.log("Datos recibidos:", data);
 
-            // Aplanar el array anidado
-            const pagosAplanados = data.prestamos.flat(); 
+                // Aplanar el array anidado y filtrar datos válidos
+                const pagosAplanados = data.prestamos.flat().filter((pago) => pago.idPagos && pago.montoPagado);
 
-            setPagosData(pagosAplanados || []);
-        } catch (err) {
-            setError('No se pudo cargar la lista de pagos.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+                setPagosData(pagosAplanados || []);
+            } catch (err) {
+                setError('No se pudo cargar la lista de pagos.');
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    cargarPagos();
-}, []);
+        cargarPagos();
+    }, []);
 
 
     const filteredPagos = useMemo(() => {
@@ -71,14 +71,17 @@ const Pagos = () => {
 
 
     const montoColumnTemplate = (rowData) => {
-        return `$${rowData.montoPagado}`;
+        if (rowData.montoPagado == null) {
+            return 'Monto no disponible'; // Mensaje alternativo para valores nulos o undefined
+        }
+        return `$${parseFloat(rowData.montoPagado).toFixed(2)}`; // Asegura que se muestre en formato de moneda
     };
 
     const fechaColumnTemplate = (rowData) => {
         if (!rowData.fechaPago) {
             return 'Fecha inválida'; // Mensaje claro si no hay fecha
         }
-    
+
         try {
             const fecha = new Date(rowData.fechaPago);
             if (isNaN(fecha)) {
@@ -90,8 +93,8 @@ const Pagos = () => {
             return 'Fecha inválida'; // Evitar fallos en el renderizado
         }
     };
-    
-    
+
+
     const tableHeader = (
         <div className="header-container">
             <div className="search-filters">
@@ -124,12 +127,15 @@ const Pagos = () => {
                 rows={5}
                 responsiveLayout="scroll"
                 className="custom-datatable"
+                tableStyle={{ margin: '0 auto' }} /* Centra la tabla */
             >
-                <Column field="idPagos" header="ID Pago" sortable />
-                <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable />
-                <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable />
-                <Column field="medioPago" header="Método de Pago" sortable />
+                <Column field="idPagos" header="ID Pago" sortable style={{ width: '15%' }} />
+                <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable style={{ width: '20%' }} />
+                <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable style={{ width: '25%' }} />
+                <Column field="medioPago" header="Método de Pago" sortable style={{ width: '20%' }} />
             </DataTable>
+
+
 
         </div>
     );
