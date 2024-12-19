@@ -131,6 +131,8 @@ const Pagos = () => {
             >
                 <Column field="idPagos" header="ID Pago" sortable style={{ width: '15%' }} />
                 <Column field="montoPagado" header="Monto" body={montoColumnTemplate} sortable style={{ width: '20%' }} />
+                <Column field="amortizacion" header="Amortizacion" sortable style={{ width: '20%' }} />
+                <Column field="numeroPagos" header="# de Pagos" sortable style={{ width: '20%' }} />
                 <Column field="fechaPago" header="Fecha Pago" body={fechaColumnTemplate} sortable style={{ width: '25%' }} />
                 <Column field="medioPago" header="Método de Pago" sortable style={{ width: '20%' }} />
             </DataTable>
