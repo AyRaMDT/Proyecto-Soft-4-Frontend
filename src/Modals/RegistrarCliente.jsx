@@ -150,6 +150,8 @@ const RegistrarCliente = () => {
           summary: "Registro exitoso",
           detail: response.message,
         });
+        window.location.reload();
+
   
         // Limpia el formulario
         setFormData({

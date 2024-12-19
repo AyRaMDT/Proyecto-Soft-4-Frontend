@@ -52,7 +52,7 @@ const AnalistaManagementPage = () => {
             const normalizedItem = {};
             for (const key in item) {
                 const normalizedKey =
-                    key === 'personaCedula' ? 'Cedula' : key.charAt(0).toLowerCase() + key.slice(1);
+                    key === 'personaCedula' ? 'cedula' : key.charAt(0).toLowerCase() + key.slice(1);
                 normalizedItem[normalizedKey] = item[key];
             }
             return normalizedItem;
@@ -155,8 +155,12 @@ const AnalistaManagementPage = () => {
                 life: 3000,
             });
 
-            const data = await obtenerAnalistas();
-            setAnalistas(data.analistas || []);
+            // Actualiza el estado localmente
+            const updatedAnalistas = analistas.filter(
+                (analista) => analista.idanalistaCredito !== idanalistaCredito
+            );
+            setAnalistas(updatedAnalistas);
+            setFilteredAnalistas(updatedAnalistas);
         } catch (error) {
             console.error('Error al eliminar analista:', error);
             toast.current.show({
@@ -167,6 +171,7 @@ const AnalistaManagementPage = () => {
             });
         }
     };
+
 
     const openDialog = (analista = null) => {
         setSelectedAnalista(
@@ -198,7 +203,7 @@ const AnalistaManagementPage = () => {
             setErrors((prev) => ({ ...prev, personaCedula: null }));
         }
     };
-    
+
     const validateNombre = (value) => {
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
             setErrors((prev) => ({
@@ -209,7 +214,7 @@ const AnalistaManagementPage = () => {
             setErrors((prev) => ({ ...prev, nombre: null }));
         }
     };
-    
+
     const validatePrimerApellido = (value) => {
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
             setErrors((prev) => ({
@@ -220,7 +225,7 @@ const AnalistaManagementPage = () => {
             setErrors((prev) => ({ ...prev, primerApellido: null }));
         }
     };
-    
+
     const validateSegundoApellido = (value) => {
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
             setErrors((prev) => ({
@@ -231,7 +236,7 @@ const AnalistaManagementPage = () => {
             setErrors((prev) => ({ ...prev, segundoApellido: null }));
         }
     };
-    
+
     const validateTelefono = (value) => {
         if (!/^\d*$/.test(value)) {
             setErrors((prev) => ({
@@ -242,7 +247,7 @@ const AnalistaManagementPage = () => {
             setErrors((prev) => ({ ...prev, telefono: null }));
         }
     };
-    
+
     const dialogFooter = (
         <div>
             <Button
@@ -315,79 +320,81 @@ const AnalistaManagementPage = () => {
             </div>
 
             <Dialog
-    header={isEditing ? 'Editar Analista' : 'Nuevo Analista'}
-    visible={isDialogVisible}
-    onHide={() => setIsDialogVisible(false)}
-    footer={dialogFooter}
->
-    <div className="p-fluid">
-        <div className="p-field">
-            <label htmlFor="personaCedula">Número de cédula</label>
-            <InputText
-                id="personaCedula"
-                value={selectedAnalista?.personaCedula || ''}
-                onChange={(e) =>
-                    setSelectedAnalista((prev) => ({
-                        ...prev,
-                        personaCedula: e.target.value,
-                    }))
-                }
-                onInput={(e) => validateCedula(e.target.value)}
-            />
-            {errors.personaCedula && (
-                <small className="p-error">{errors.personaCedula}</small>
-            )}
-        </div>
-        <div className="p-field">
-            <label htmlFor="nombre">Nombre</label>
-            <InputText
-                id="nombre"
-                value={selectedAnalista?.nombre || ''}
-                onChange={(e) =>
-                    setSelectedAnalista((prev) => ({
-                        ...prev,
-                        nombre: e.target.value,
-                    }))
-                }
-                onInput={(e) => validateNombre(e.target.value)}
-            />
-            {errors.nombre && <small className="p-error">{errors.nombre}</small>}
-        </div>
-        <div className="p-field">
-            <label htmlFor="primerApellido">Primer Apellido</label>
-            <InputText
-                id="primerApellido"
-                value={selectedAnalista?.primerApellido || ''}
-                onChange={(e) =>
-                    setSelectedAnalista((prev) => ({
-                        ...prev,
-                        primerApellido: e.target.value,
-                    }))
-                }
-                onInput={(e) => validatePrimerApellido(e.target.value)}
-            />
-            {errors.primerApellido && (
-                <small className="p-error">{errors.primerApellido}</small>
-            )}
-        </div>
-        <div className="p-field">
-            <label htmlFor="segundoApellido">Segundo Apellido</label>
-            <InputText
-                id="segundoApellido"
-                value={selectedAnalista?.segundoApellido || ''}
-                onChange={(e) =>
-                    setSelectedAnalista((prev) => ({
-                        ...prev,
-                        segundoApellido: e.target.value,
-                    }))
-                }
-                onInput={(e) => validateSegundoApellido(e.target.value)}
-            />
-            {errors.segundoApellido && (
-                <small className="p-error">{errors.segundoApellido}</small>
-            )}
-        </div>
-        <div className="p-field">
+                header={isEditing ? 'Editar Analista' : 'Nuevo Analista'}
+                visible={isDialogVisible}
+                onHide={() => setIsDialogVisible(false)}
+                footer={dialogFooter}
+            >
+                <div className="p-fluid">
+                    <div className="p-field">
+                        <label htmlFor="personaCedula">Número de cédula</label>
+                        <InputText
+                            id="personaCedula"
+                            value={selectedAnalista?.personaCedula || ''}
+                            onChange={(e) =>
+                                setSelectedAnalista((prev) => ({
+                                    ...prev,
+                                    personaCedula: e.target.value,
+                                }))
+                            }
+                            onInput={(e) => validateCedula(e.target.value)}
+                            placeholder={isEditing ? selectedAnalista?.cedula || '' : ''}
+                        />
+                        {errors.cedula && (
+                            <small className="p-error">{errors.personaCedula}</small>
+                        )}
+                    </div>
+
+                    <div className="p-field">
+                        <label htmlFor="nombre">Nombre</label>
+                        <InputText
+                            id="nombre"
+                            value={selectedAnalista?.nombre || ''}
+                            onChange={(e) =>
+                                setSelectedAnalista((prev) => ({
+                                    ...prev,
+                                    nombre: e.target.value,
+                                }))
+                            }
+                            onInput={(e) => validateNombre(e.target.value)}
+                        />
+                        {errors.nombre && <small className="p-error">{errors.nombre}</small>}
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="primerApellido">Primer Apellido</label>
+                        <InputText
+                            id="primerApellido"
+                            value={selectedAnalista?.primerApellido || ''}
+                            onChange={(e) =>
+                                setSelectedAnalista((prev) => ({
+                                    ...prev,
+                                    primerApellido: e.target.value,
+                                }))
+                            }
+                            onInput={(e) => validatePrimerApellido(e.target.value)}
+                        />
+                        {errors.primerApellido && (
+                            <small className="p-error">{errors.primerApellido}</small>
+                        )}
+                    </div>
+                    <div className="p-field">
+                        <label htmlFor="segundoApellido">Segundo Apellido</label>
+                        <InputText
+                            id="segundoApellido"
+                            value={selectedAnalista?.segundoApellido || ''}
+                            onChange={(e) =>
+                                setSelectedAnalista((prev) => ({
+                                    ...prev,
+                                    segundoApellido: e.target.value,
+                                }))
+                            }
+                            onInput={(e) => validateSegundoApellido(e.target.value)}
+                        />
+                        {errors.segundoApellido && (
+                            <small className="p-error">{errors.segundoApellido}</small>
+                        )}
+                    </div>
+                    <div className="p-field">
                         <label htmlFor="telefono">Teléfono</label>
                         <InputText
                             id="telefono"

@@ -1,48 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const Login = () => {
     const [cedula, setCedula] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const {IniciarSesion} = useAuth()
+    const toast = useRef(null); // Reference for the Toast
+    const { IniciarSesion } = useAuth();
     const navigate = useNavigate();
-
 
     const handleLogin = async () => {
         setLoading(true);
-        setError("");
-      
+
         try {
-          const result = await IniciarSesion(cedula, password);
-          
-          if (result?.rol === "cliente") {
-            navigate("/");
-          } else if (result?.rol === "analista") {
-            navigate("/InicioAnalistas");
-          }
+            const result = await IniciarSesion(cedula, password);
+
+            if (result?.rol === 'cliente') {
+                navigate('/');
+            } else if (result?.rol === 'analista') {
+                navigate('/InicioAnalistas');
+            } else {
+                throw new Error('Credenciales inválidas');
+            }
         } catch (err) {
-          setError(err.message);
+            // Display a Toast message if login fails
+            toast.current.show({
+                severity: 'error',
+                summary: 'Error de autenticación',
+                detail: 'Cédula o contraseña incorrecta. Por favor, intente de nuevo.',
+                life: 3000,
+            });
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
-      
+    };
 
     return (
         <div className="login-container">
+            <Toast ref={toast} /> {/* Toast Component */}
             <div className="login-section">
                 <div className="login-header">
                     <span className="active">Inicio de Sesión</span>
                 </div>
 
                 <div className="login-form">
-                    {error && <p className="error-message">{error}</p>}
-
                     <span className="p-input-icon-left">
                         <i className="pi pi-user" />
                         <InputText
@@ -74,9 +79,9 @@ const Login = () => {
             </div>
 
             <div className="image-section">
-                <img src="/img/login.png" alt="Decorative" className='imagenLogin' />
+                <img src="/img/login.png" alt="Decorative" className="imagenLogin" />
             </div>
-        </div >
+        </div>
     );
 };
 
