@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
-import { login } from '../api/Login';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-const Login = ({ setRole }) => {
+const Login = () => {
     const [cedula, setCedula] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const {IniciarSesion} = useAuth()
     const navigate = useNavigate();
+
 
     const handleLogin = async () => {
         setLoading(true);
         setError("");
       
         try {
-          const result = await login(cedula, password);
-          alert(result.mensaje); 
-          setRole(result.rol); 
-      
+          const result = await IniciarSesion(cedula, password);
+          console.log(result);
+          
+          alert(result.mensaje);       
           if (result.rol === "cliente") {
             navigate("/");
           } else if (result.rol === "analista") {

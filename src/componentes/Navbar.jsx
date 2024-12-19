@@ -2,7 +2,6 @@ import React, { useState} from "react";
 import { Sidebar } from "primereact/sidebar";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../api/Login";
 import { generarPdfFormalizacionPrestamos } from "../Paginas/pdfFormalizacionPrestamos";
 import { generarPdfClientes } from "../Paginas/pdfClientes";
 
@@ -10,16 +9,17 @@ import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import RegistrarCliente from "../Modals/RegistrarCliente";
+import { useAuth } from "../hooks/useAuth";
 
-const Navbar = ({ role, setRole }) => {
+const Navbar = () => {
+  const {user, Logout} = useAuth();
   const [visible, setVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await logout();
-      setRole(null);
+      await Logout();
       navigate("/");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -72,7 +72,7 @@ const Navbar = ({ role, setRole }) => {
           >
             <div className="navbar-menu">
               {/* Opciones para usuarios no autenticados */}
-              {!role && (
+              {!user?.rol && (
                 <>
                   <Button
                     label="Inicio"
@@ -92,7 +92,7 @@ const Navbar = ({ role, setRole }) => {
               )}
 
               {/* Opciones para analistas */}
-              {role === "analista" && (
+              {user?.rol === "analista" && (
                 <>
                   <Button
                     label="Inicio Analistas"
@@ -133,7 +133,7 @@ const Navbar = ({ role, setRole }) => {
               )}
 
               {/* Opciones para clientes */}
-              {role === "cliente" && (
+              {user?.rol === "cliente" && (
                 <>
                   <Button
                     label="Inicio Clientes"
@@ -174,7 +174,7 @@ const Navbar = ({ role, setRole }) => {
               )}
 
               {/* Botón de salir para todos los usuarios autenticados */}
-              {role && (
+              {user?.rol && (
                 <Button
                   label="Salir"
                   icon="pi pi-sign-out"
