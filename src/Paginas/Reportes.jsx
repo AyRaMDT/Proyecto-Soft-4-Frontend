@@ -31,7 +31,7 @@ const LoanAnalystDashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>Panel para Reportes</h1>
-        <p>Exporteción en PDF y consulta de datos</p>
+        <p>Exportación en PDF y consulta de datos</p>
       </div>
 
       <div className="dashboard-grid">

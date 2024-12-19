@@ -52,6 +52,14 @@
     margin-bottom: 10px;
   }
 
+  .loan-status.cancelado {
+    background-color: #007bff; /* Azul */
+    color: white; /* Texto blanco */
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
   .loan-number {
     font-weight: bold;
     color: #20b2aa;
