@@ -1,0 +1,57 @@
+/* Estilo del modal de Realizar Pago */
+.containerPrestamos {
+
+    justify-content: center;
+    align-items: center;
+    padding: 45px;
+    margin-bottom: 100px !important;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Dos columnas */
+    gap: 20px; /* Espaciado entre campos */
+    margin-top: 10px;
+    margin-bottom: 100px !important;
+
+  }
+  
+  .form-label {
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .form-input, select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #555;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-input:focus, select:focus {
+    outline: none;
+    border-color: #00bfa5; /* Verde */
+    box-shadow: 0 0 5px rgba(0, 191, 165, 0.5);
+  }
+  
+  .submit-button-container {
+    grid-column: span 2; /* Botón ocupa dos columnas */
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+ 
+  
+  .dialog-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00bfa5;
+    margin-bottom: 20px;
+  }
+  

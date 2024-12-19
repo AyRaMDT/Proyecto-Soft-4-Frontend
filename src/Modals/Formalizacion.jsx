@@ -23,18 +23,15 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
   const [isActionDisabled, setIsActionDisabled] = useState(false);
   const toastRef = useRef(null);
 
-
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const profileResponse = await getProfile();
         const profile = profileResponse.perfil;
 
-        console.log(profile)
-
         setFormData((prevState) => ({
           ...prevState,
-          idanalistaCredito: profile.idAnalista || "",
+          idanalistaCredito: profile.idanalistaCredito || "",
           personaCedula: profile.personaCedula || "",
         }));
       } catch (error) {
@@ -52,80 +49,75 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
           ? (prestamo.monto / prestamo.PlazoMeses).toFixed(2)
           : null;
 
-          console.log(prestamo)
       setFormData((prevState) => ({
         ...prevState,
         idPrestamoFormal: prestamo.idPrestamos || null,
         prestamoscliente_idPrestamos: prestamo.idPrestamos || null,
-        IdClientes: prestamo.idClientes || "",
+        IdClientes: prestamo.IdClientes || "",
         clientesPersonaCedula: prestamo.clientesPersonaCedula || "",
         prestamoClienteCuota: cuota,
       }));
-
 
       setIsActionDisabled(prestamo.estadoPrestamo === 1 || prestamo.estadoPrestamo === 4);
     }
   }, [prestamo]);
 
-
   const handleSave = async () => {
     if (!formData.idPrestamoFormal || !formData.prestamoscliente_idPrestamos) {
-        toastRef.current.show({
-            severity: "warn",
-            summary: "Campos obligatorios",
-            detail: "Por favor, complete todos los campos.",
-            life: 3000,
-        });
-        return;
+      toastRef.current.show({
+        severity: "warn",
+        summary: "Campos obligatorios",
+        detail: "Por favor, complete todos los campos.",
+        life: 3000,
+      });
+      return;
     }
 
     try {
-        if (action === "approve") {
-            await aprobarPrestamo(formData.idPrestamoFormal);
-            await agregarFormalizacion({
-                analistaIdAnalista: formData.idanalistaCredito,
-                analistaPersonaCedula: formData.personaCedula,
-                prestamoClienteCuota: formData.prestamoClienteCuota,
-                prestamoscliente_idPrestamos: formData.prestamoscliente_idPrestamos,
-            });
-
-            toastRef.current.show({
-                severity: "success",
-                summary: "Préstamo Aprobado",
-                detail: "El préstamo fue aprobado y formalizado correctamente.",
-                life: 1000,
-            });
-        } else if (action === "reject") {
-            await rechazarPrestamo(formData.idPrestamoFormal);
-
-            toastRef.current.show({
-                severity: "info",
-                summary: "Préstamo Rechazado",
-                detail: "El préstamo fue rechazado correctamente.",
-                life: 1000,
-            });
-        }
-
-        setIsActionDisabled(true);
-
-        // Recarga la página después de que el Toast desaparezca
-        setTimeout(() => {
-            window.location.reload();
-        }, 3000); // Coincide con el tiempo de vida del Toast
-    } catch (error) {
-        toastRef.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo.`,
-            life: 3000,
+      if (action === "approve") {
+        await aprobarPrestamo(formData.idPrestamoFormal);
+        await agregarFormalizacion({
+          analistaIdAnalista: formData.idanalistaCredito,
+          analistaPersonaCedula: formData.personaCedula,
+          prestamoClienteCuota: formData.prestamoClienteCuota,
+          prestamoscliente_idPrestamos: formData.prestamoscliente_idPrestamos,
         });
-        console.error(
-            `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo:`,
-            error
-        );
-    }
-};
 
+        toastRef.current.show({
+          severity: "success",
+          summary: "Préstamo Aprobado",
+          detail: "El préstamo fue aprobado y formalizado correctamente.",
+          life: 3000,
+        });
+      } else if (action === "reject") {
+        await rechazarPrestamo(formData.idPrestamoFormal);
+
+        toastRef.current.show({
+          severity: "info",
+          summary: "Préstamo Rechazado",
+          detail: "El préstamo fue rechazado correctamente.",
+          life: 3000,
+        });
+      }
+
+      setIsActionDisabled(true);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (error) {
+      toastRef.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo.`,
+        life: 3000,
+      });
+      console.error(
+        `Error al ${action === "approve" ? "aprobar" : "rechazar"} el préstamo:`,
+        error
+      );
+    }
+  };
 
   const dialogFooter = (
     <div className="flex justify-content-end">
@@ -134,7 +126,7 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
         icon="pi pi-times"
         onClick={onHide}
         className="p-button-text p-button-secondary mr-2"
-        disabled={isActionDisabled} 
+        disabled={isActionDisabled}
       />
       <Button
         label={action === "approve" ? "Aprobar" : "Rechazar"}
@@ -157,11 +149,23 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
     >
       <Toast ref={toastRef} />
       <form style={{ display: "grid", gap: "1rem", padding: "1.5rem" }}>
+        <label htmlFor="idPrestamoFormal">ID de Préstamo Formal</label>
         <InputText id="idPrestamoFormal" value={formData.idPrestamoFormal} disabled />
+
+        <label htmlFor="IdClientes">ID de Clientes</label>
         <InputText id="IdClientes" value={formData.IdClientes} disabled />
+
+        <label htmlFor="clientesPersonaCedula">Cédula del Cliente</label>
         <InputText id="clientesPersonaCedula" value={formData.clientesPersonaCedula} disabled />
+
+        <label htmlFor="idanalistaCredito">ID de Analista de Crédito</label>
         <InputText id="idanalistaCredito" value={formData.idanalistaCredito} disabled />
+
+        <label htmlFor="personaCedula">Cédula del Analista</label>
         <InputText id="personaCedula" value={formData.personaCedula} disabled />
+
+        
+        <label htmlFor="prestamoClienteCuota">Cuota del Préstamo</label>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
           <InputNumber
             id="prestamoClienteCuota"
@@ -185,6 +189,7 @@ const LoanModal = ({ visible, action, prestamo, onHide }) => {
             tooltip={isCuotaEditable ? "Deshabilitar edición" : "Habilitar edición"}
           />
         </div>
+        
       </form>
     </Dialog>
   );

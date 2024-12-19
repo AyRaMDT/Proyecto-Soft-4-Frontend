@@ -1,0 +1,123 @@
+.container {
+    padding: 2rem;
+    max-width: 1260px;
+    /* Mantiene un ancho máximo para el contenedor */
+    margin-bottom: 250px;
+}
+
+.text-center h1 {
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+    margin-bottom: 1rem;
+}
+
+button.p-button {
+    background-color: #007b7f;
+    color: white;
+    transition: background-color 0.3s ease-in-out;
+}
+
+button.p-button:hover {
+    background-color: #005f73;
+}
+
+input,
+.p-calendar {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+}
+
+.grid {
+    gap: 2rem;
+    /* Aumenta el espacio entre los calendarios y los botones */
+}
+
+.flex.items-center.space-x-4 {
+    gap: 1rem;
+    /* Aumenta el espacio entre los botones */
+}
+
+.mt-8 {
+    margin-top: 2rem;
+    /* Aumenta el espacio entre la tabla y los filtros */
+}
+
+.dataTable {
+    margin-top: 2rem;
+    /* Separa la tabla de otros elementos */
+
+}
+
+.p-datatable-elegant .p-datatable-header {
+    background: #f1f8f7;
+    color: #00695c;
+    border: 1px solid #e0f2f1;
+    border-radius: 6px 6px 0 0;
+}
+
+.p-datatable-elegant .p-datatable-thead>tr>th {
+    background: #f1f8f7;
+    color: #00695c;
+    border: 1px solid #e0f2f1;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.p-datatable-elegant .p-datatable-tbody>tr {
+    background: #ffffff;
+    transition: background-color 0.2s;
+}
+
+.p-datatable-elegant .p-datatable-tbody>tr:nth-child(even) {
+    background: #f8fcfc;
+}
+
+.p-datatable-elegant .p-datatable-tbody>tr:hover {
+    background: #e0f2f1;
+}
+
+.p-calendar .p-inputtext:focus {
+    border-color: #00695c;
+    box-shadow: 0 0 0 1px #00695c40;
+}
+
+.p-button:hover {
+    opacity: 0.9;
+}
+
+.p-button-success {
+    background-color: #28a745;
+    border-color: #28a745;
+    transition: all 0.3s ease;
+}
+
+.p-button-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.grid {
+    gap: 2rem;
+    /* Espacio entre las columnas del calendario y los botones */
+}
+
+.flex.items-center.space-x-6 {
+    gap: 1.5rem;
+    /* Ajusta el espacio horizontal entre los botones */
+    margin-top: 40px;
+}
+
+.p-button {
+    padding: 0.75rem 1.5rem;
+    /* Tamaño consistente de los botones */
+
+}
+
+
+.p-button-success,
+.p-button-primary {
+    margin-right: 1rem;
+    /* Margen adicional en cada botón */
+}

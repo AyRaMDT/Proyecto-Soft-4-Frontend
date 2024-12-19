@@ -15,11 +15,12 @@ import '../Css/analistaManagement.css';
 
 const AnalistaManagementPage = () => {
     const [analistas, setAnalistas] = useState([]);
-    const [filteredAnalistas, setFilteredAnalistas] = useState([]); // Nuevo estado para usuarios filtrados
+    const [filteredAnalistas, setFilteredAnalistas] = useState([]);
     const [selectedAnalista, setSelectedAnalista] = useState(null);
     const [isDialogVisible, setIsDialogVisible] = useState(false);
-    const [isEditing, setIsEditing] = useState(false);
-    const [searchTerm, setSearchTerm] = useState(''); // Término de búsqueda
+    const [isEditing, setIsEditing] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [errors, setErrors] = useState({}); // Estado para errores de validación
     const toast = useRef(null);
 
     useEffect(() => {
@@ -28,7 +29,7 @@ const AnalistaManagementPage = () => {
                 const data = await obtenerAnalistas();
                 const analistasProcesados = normalizeKeys(data.analistas?.[0] || []);
                 setAnalistas(analistasProcesados);
-                setFilteredAnalistas(analistasProcesados); // Inicializa usuarios filtrados
+                setFilteredAnalistas(analistasProcesados);
             } catch (error) {
                 console.error('Error al obtener analistas:', error);
             }
@@ -38,7 +39,6 @@ const AnalistaManagementPage = () => {
     }, []);
 
     useEffect(() => {
-        // Filtro dinámico basado en el término de búsqueda
         const filtered = analistas.filter((analista) =>
             Object.values(analista).some((value) =>
                 value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -59,34 +59,68 @@ const AnalistaManagementPage = () => {
         });
     };
 
+    const validateFields = () => {
+        const newErrors = {};
+
+        if (!selectedAnalista.personaCedula || !/^\d{1,9}$/.test(selectedAnalista.personaCedula)) {
+            newErrors.personaCedula = 'La cédula debe contener solo números y tener máximo 9 dígitos.';
+        }
+        if (!selectedAnalista.nombre || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(selectedAnalista.nombre)) {
+            newErrors.nombre = 'El nombre solo puede contener letras.';
+        }
+        if (!selectedAnalista.primerApellido || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(selectedAnalista.primerApellido)) {
+            newErrors.primerApellido = 'El primer apellido solo puede contener letras.';
+        }
+        if (!selectedAnalista.segundoApellido || !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(selectedAnalista.segundoApellido)) {
+            newErrors.segundoApellido = 'El segundo apellido solo puede contener letras.';
+        }
+        if (!selectedAnalista.telefono || !/^\d+$/.test(selectedAnalista.telefono)) {
+            newErrors.telefono = 'El teléfono solo puede contener números.';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleSave = async () => {
+        if (!validateFields()) {
+            toast.current.show({
+                severity: 'warn',
+                summary: 'Errores en el formulario',
+                detail: 'Corrige los errores antes de continuar.',
+                life: 3000,
+            });
+            return;
+        }
+
         try {
             if (isEditing) {
                 const analistaToUpdate = {
                     ...selectedAnalista,
-                    personaCedula: selectedAnalista.personaCedula || selectedAnalista.cedula, // Asegúrate de usar el nombre correcto
+                    personaCedula: selectedAnalista.personaCedula || selectedAnalista.cedula,
                 };
 
                 if (!analistaToUpdate.personaCedula) {
                     throw new Error('El número de cédula es requerido para modificar un analista.');
                 }
 
-                await modificarAnalista(analistaToUpdate); // Pasa el objeto completo
+                await modificarAnalista(analistaToUpdate);
                 toast.current.show({
                     severity: 'success',
                     summary: 'Analista modificado',
                     detail: 'El analista ha sido actualizado.',
                     life: 3000,
                 });
+                window.location.reload();
             } else {
-                await insertarAnalista(selectedAnalista); // Enviar en formato JSON
+                await insertarAnalista(selectedAnalista);
                 toast.current.show({
                     severity: 'success',
                     summary: 'Analista agregado',
                     detail: 'El analista ha sido agregado exitosamente.',
                     life: 3000,
                 });
+                window.location.reload();
             }
         } catch (error) {
             console.error('Error in handleSave:', error);
@@ -99,11 +133,9 @@ const AnalistaManagementPage = () => {
         }
     };
 
-
-
     const handleDelete = async (idanalistaCredito) => {
         try {
-            console.log('ID enviado para eliminar:', idanalistaCredito); // Agregar depuración
+            console.log('ID enviado para eliminar:', idanalistaCredito);
 
             if (!idanalistaCredito) {
                 toast.current.show({
@@ -115,8 +147,7 @@ const AnalistaManagementPage = () => {
                 return;
             }
 
-            await eliminarAnalista(idanalistaCredito); // Pasar el ID directamente
-
+            await eliminarAnalista(idanalistaCredito);
             toast.current.show({
                 severity: 'success',
                 summary: 'Analista eliminado',
@@ -124,7 +155,7 @@ const AnalistaManagementPage = () => {
                 life: 3000,
             });
 
-            const data = await obtenerAnalistas(); // Actualizar la tabla después de eliminar
+            const data = await obtenerAnalistas();
             setAnalistas(data.analistas || []);
         } catch (error) {
             console.error('Error al eliminar analista:', error);
@@ -137,11 +168,10 @@ const AnalistaManagementPage = () => {
         }
     };
 
-
     const openDialog = (analista = null) => {
         setSelectedAnalista(
             analista || {
-                idanalistaCredito: '', // Inicializa todos los campos necesarios
+                idanalistaCredito: '',
                 personaCedula: '',
                 nombre: '',
                 primerApellido: '',
@@ -151,16 +181,68 @@ const AnalistaManagementPage = () => {
                 contrasena: '',
             }
         );
-        setIsEditing(!!analista); // true si es edición
+        setIsEditing(!!analista);
         setIsDialogVisible(true);
     };
-
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
-
-
+    const validateCedula = (value) => {
+        if (!/^\d{0,9}$/.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                personaCedula: "La cédula debe contener solo números y tener máximo 9 dígitos.",
+            }));
+        } else {
+            setErrors((prev) => ({ ...prev, personaCedula: null }));
+        }
+    };
+    
+    const validateNombre = (value) => {
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                nombre: "El nombre solo puede contener letras.",
+            }));
+        } else {
+            setErrors((prev) => ({ ...prev, nombre: null }));
+        }
+    };
+    
+    const validatePrimerApellido = (value) => {
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                primerApellido: "El primer apellido solo puede contener letras.",
+            }));
+        } else {
+            setErrors((prev) => ({ ...prev, primerApellido: null }));
+        }
+    };
+    
+    const validateSegundoApellido = (value) => {
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                segundoApellido: "El segundo apellido solo puede contener letras.",
+            }));
+        } else {
+            setErrors((prev) => ({ ...prev, segundoApellido: null }));
+        }
+    };
+    
+    const validateTelefono = (value) => {
+        if (!/^\d*$/.test(value)) {
+            setErrors((prev) => ({
+                ...prev,
+                telefono: "El teléfono solo puede contener números.",
+            }));
+        } else {
+            setErrors((prev) => ({ ...prev, telefono: null }));
+        }
+    };
+    
     const dialogFooter = (
         <div>
             <Button
@@ -188,7 +270,7 @@ const AnalistaManagementPage = () => {
             <Button
                 icon="pi pi-trash"
                 className="btn-eliminar"
-                onClick={() => handleDelete(rowData.idanalistaCredito)} // Pasar el ID directamente
+                onClick={() => handleDelete(rowData.idanalistaCredito)}
             />
         </div>
     );
@@ -215,7 +297,7 @@ const AnalistaManagementPage = () => {
                     />
                 </div>
                 <DataTable
-                    value={filteredAnalistas} // Filtra los analistas que se muestran
+                    value={filteredAnalistas}
                     stripedRows
                     paginator
                     rows={5}
@@ -232,83 +314,94 @@ const AnalistaManagementPage = () => {
                 </DataTable>
             </div>
 
-
             <Dialog
-
-                header={isEditing ? 'Editar Analista' : 'Nuevo Analista'}
-                visible={isDialogVisible}
-                onHide={() => setIsDialogVisible(false)}
-                footer={dialogFooter}
-            >
-                <div className="p-fluid">
-                    <div className="p-field">
-                        <label htmlFor="idanalistaCredito">ID analista</label>
+    header={isEditing ? 'Editar Analista' : 'Nuevo Analista'}
+    visible={isDialogVisible}
+    onHide={() => setIsDialogVisible(false)}
+    footer={dialogFooter}
+>
+    <div className="p-fluid">
+        <div className="p-field">
+            <label htmlFor="personaCedula">Número de cédula</label>
+            <InputText
+                id="personaCedula"
+                value={selectedAnalista?.personaCedula || ''}
+                onChange={(e) =>
+                    setSelectedAnalista((prev) => ({
+                        ...prev,
+                        personaCedula: e.target.value,
+                    }))
+                }
+                onInput={(e) => validateCedula(e.target.value)}
+            />
+            {errors.personaCedula && (
+                <small className="p-error">{errors.personaCedula}</small>
+            )}
+        </div>
+        <div className="p-field">
+            <label htmlFor="nombre">Nombre</label>
+            <InputText
+                id="nombre"
+                value={selectedAnalista?.nombre || ''}
+                onChange={(e) =>
+                    setSelectedAnalista((prev) => ({
+                        ...prev,
+                        nombre: e.target.value,
+                    }))
+                }
+                onInput={(e) => validateNombre(e.target.value)}
+            />
+            {errors.nombre && <small className="p-error">{errors.nombre}</small>}
+        </div>
+        <div className="p-field">
+            <label htmlFor="primerApellido">Primer Apellido</label>
+            <InputText
+                id="primerApellido"
+                value={selectedAnalista?.primerApellido || ''}
+                onChange={(e) =>
+                    setSelectedAnalista((prev) => ({
+                        ...prev,
+                        primerApellido: e.target.value,
+                    }))
+                }
+                onInput={(e) => validatePrimerApellido(e.target.value)}
+            />
+            {errors.primerApellido && (
+                <small className="p-error">{errors.primerApellido}</small>
+            )}
+        </div>
+        <div className="p-field">
+            <label htmlFor="segundoApellido">Segundo Apellido</label>
+            <InputText
+                id="segundoApellido"
+                value={selectedAnalista?.segundoApellido || ''}
+                onChange={(e) =>
+                    setSelectedAnalista((prev) => ({
+                        ...prev,
+                        segundoApellido: e.target.value,
+                    }))
+                }
+                onInput={(e) => validateSegundoApellido(e.target.value)}
+            />
+            {errors.segundoApellido && (
+                <small className="p-error">{errors.segundoApellido}</small>
+            )}
+        </div>
+        <div className="p-field">
+                        <label htmlFor="telefono">Teléfono</label>
                         <InputText
-                            id="idanalistaCredito"
-                            value={selectedAnalista?.idanalistaCredito || ''}
+                            id="telefono"
+                            value={selectedAnalista?.telefono || ''}
                             onChange={(e) =>
                                 setSelectedAnalista((prev) => ({
                                     ...prev,
-                                    idanalistaCredito: e.target.value,
+                                    telefono: e.target.value,
                                 }))
                             }
                         />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="personaCedula">Número de cédula</label>
-                        <InputText
-                            id="personaCedula"
-                            value={selectedAnalista?.cedula || ''} // Usa personaCedula directamente
-                            onChange={(e) =>
-                                setSelectedAnalista((prev) => ({
-                                    ...prev,
-                                    personaCedula: e.target.value,
-                                }))
-                            }
-                            readOnly={isEditing} // Deshabilitar solo en modo edición
-                            placeholder={!isEditing ? 'Ingrese la cédula' : ''} // Mostrar placeholder si es nuevo
-                        />
-                    </div>
-
-
-                    <div className="p-field">
-                        <label htmlFor="nombre">Nombre</label>
-                        <InputText
-                            id="nombre"
-                            value={selectedAnalista?.nombre || ''}
-                            onChange={(e) =>
-                                setSelectedAnalista((prev) => ({
-                                    ...prev,
-                                    nombre: e.target.value,
-                                }))
-                            }
-                        />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="primerApellido">Primer Apellido</label>
-                        <InputText
-                            id="primerApellido"
-                            value={selectedAnalista?.primerApellido || ''}
-                            onChange={(e) =>
-                                setSelectedAnalista((prev) => ({
-                                    ...prev,
-                                    primerApellido: e.target.value,
-                                }))
-                            }
-                        />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="segundoApellido">Segundo Apellido</label>
-                        <InputText
-                            id="segundoApellido"
-                            value={selectedAnalista?.segundoApellido || ''}
-                            onChange={(e) =>
-                                setSelectedAnalista((prev) => ({
-                                    ...prev,
-                                    segundoApellido: e.target.value,
-                                }))
-                            }
-                        />
+                        {errors.telefono && (
+                            <span className="p-error">{errors.telefono}</span>
+                        )}
                     </div>
                     <div className="p-field">
                         <label htmlFor="correoElectronico">Correo Electrónico</label>
@@ -319,19 +412,6 @@ const AnalistaManagementPage = () => {
                                 setSelectedAnalista((prev) => ({
                                     ...prev,
                                     correoElectronico: e.target.value,
-                                }))
-                            }
-                        />
-                    </div>
-                    <div className="p-field">
-                        <label htmlFor="telefono">Teléfono</label>
-                        <InputText
-                            id="telefono"
-                            value={selectedAnalista?.telefono || ''}
-                            onChange={(e) =>
-                                setSelectedAnalista((prev) => ({
-                                    ...prev,
-                                    telefono: e.target.value,
                                 }))
                             }
                         />

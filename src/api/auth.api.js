@@ -1,3 +1,4 @@
+import { data } from 'autoprefixer';
 import axios from 'axios';
 
 export const RegistrarAnalistaPeticion = async (analistaNuevo) => {
@@ -40,6 +41,7 @@ export const IniciarSesionPeticion = async (personaCedula, contrasena) => {
     );
 
     return response.data;
+    
   } catch (error) {
     if (error.response) {
       console.error('Error en login:', error.response.data);

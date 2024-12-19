@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, UserRoundCog, FileSpreadsheet, CreditCard, Calculator, CircleDollarSign } from 'lucide-react';
+import { Users, UserRoundCog, FileChartLine, CreditCard, ListChecks, Calculator, CircleDollarSign } from 'lucide-react';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';  
 import '../Css/inicioAnalistas.css'; 
@@ -27,23 +27,23 @@ const LoanAnalystDashboard = () => {
       route: "/mantenimientoFormalizacion" 
     },
     {
-      icon: <FileSpreadsheet className="icon-style" />,
+      icon: <ListChecks className="icon-style" />,
       title: "Formalización de Préstamos",
       description: "Proceso completo de solicitud y aprobación de préstamos",
       route: "/FormalizacionPrestamos"
     },
     {
-      icon: <Calculator className="icon-style" />,
-      title: "Cálculo y Programación de Pagos",
-      description: "Simulación y planificación detallada de cuotas",
-      route: "/cálculo-pagos"
-    },
-    {
       icon: <CreditCard className="icon-style" />,
       title: "Cobro de Pagos",
-      description: "Seguimiento y gestión de cobranzas",
+      description: "Seguimiento y gestión de cobranzas para corroborar el pago de los préstamos",
       route: "/cobro-pagos"
     },
+    {
+      icon: <FileChartLine className="icon-style" />,
+      title: "Reportes",
+      description: "Consulta de estaditicas segun fechas brindadas, además de su exportación ",
+      route: "/Reportes"
+    }
   ];
 
  

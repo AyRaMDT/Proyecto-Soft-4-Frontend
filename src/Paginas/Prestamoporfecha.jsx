@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "primereact/card";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
+import axios from "axios";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import "primereact/resources/themes/lara-light-teal/theme.css";
@@ -11,91 +12,73 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "../Css/reporteprestamos.css";
 
-const ListaSolicitudesPrestamos = () => {
+const ListaPrestamos = () => {
   const [fechaInicio, setFechaInicio] = useState(null);
   const [fechaFin, setFechaFin] = useState(null);
-  const [solicitudes, setSolicitudes] = useState([]);
+  const [prestamos, setPrestamos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [mostrarTabla, setMostrarTabla] = useState(false);
 
   const handleFiltrar = async () => {
-    if (!fechaInicio || !fechaFin) {
-      alert("Por favor selecciona ambas fechas.");
-      return;
-    }
-  
+    if (!fechaInicio || !fechaFin) return;
+
     try {
       setLoading(true);
-      const response = await fetch(
-        `http://localhost:3333/prestamos/solicitudes?fechaInicio=${fechaInicio
-          .toISOString()
-          .split("T")[0]}&fechaFin=${fechaFin.toISOString().split("T")[0]}`,
+      const response = await axios.get(
+        "http://localhost:3333/prestamos/filtroPrestamo",
         {
-          headers: {
-            "Content-Type": "application/json",
+          params: {
+            fechaInicio: fechaInicio.toISOString().split("T")[0],
+            fechaFin: fechaFin.toISOString().split("T")[0],
           },
         }
       );
-  
-      if (!response.ok) {
-        throw new Error("Error al consultar las solicitudes de préstamos.");
-      }
-  
-      const data = await response.json();
-  
-      console.log("Datos recibidos:", data); // Verifica que los datos se reciben correctamente
-  
-      if (data.solicitudes && data.solicitudes[0]?.length > 0) {
-        setSolicitudes(data.solicitudes[0]); // Ajusta aquí para acceder al array correcto
+
+      if (response.data.prestamos && response.data.prestamos[0]) {
+        setPrestamos(response.data.prestamos[0]);
         setMostrarTabla(true);
-      } else {
-        setMostrarTabla(false);
-        alert(data.message || "No se encontraron solicitudes en este rango.");
       }
     } catch (error) {
-      console.error("Error al filtrar solicitudes de préstamos:", error);
-      alert("Ocurrió un error al consultar las solicitudes.");
+      console.error("Error al filtrar préstamos:", error);
     } finally {
       setLoading(false);
     }
   };
-  
-  
 
-  const generarPdfSolicitudes = () => {
-    if (solicitudes.length === 0) {
+  const generarPdfPrestamos = () => {
+    if (prestamos.length === 0) {
       alert("No hay datos para generar el reporte.");
       return;
     }
-
+  
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
-
+    const pageHeight = doc.internal.pageSize.height;
+  
     const logoUrl = "/img/navbar.png";
   
-
-
     const addHeader = () => {
       const logoWidth = 15;
       const logoHeight = 15;
-      doc.setFontSize(18);
-      doc.text("Reporte de Solicitudes de Préstamos", pageWidth / 2, 20, {
-        align: "center",
-      });
-      
+  
+      // Agrega el logo
       doc.addImage(logoUrl, "PNG", 10, 10, logoWidth, logoHeight);
   
+      // Título del reporte
+      doc.setFontSize(18);
+      doc.text("Reporte de Préstamos", pageWidth / 2, 20, { align: "center" });
+  
+      // Fecha de impresión
       const today = new Date();
       const formattedDate = today.toLocaleDateString();
       doc.setFontSize(10);
       doc.text(`Fecha de impresión: ${formattedDate}`, pageWidth - 60, 10);
-
+  
+      // Intervalo de fechas consultadas
       const fechaInicioText = fechaInicio
         ? fechaInicio.toLocaleDateString()
         : "No especificada";
-      const fechaFinText = fechaFin
-        ? fechaFin.toLocaleDateString()
-        : "No especificada";
+      const fechaFinText = fechaFin ? fechaFin.toLocaleDateString() : "No especificada";
       doc.setFontSize(12);
       doc.text(
         `Fechas Consultadas: ${fechaInicioText} - ${fechaFinText}`,
@@ -104,68 +87,61 @@ const ListaSolicitudesPrestamos = () => {
         { align: "center" }
       );
     };
-
+  
     const addFooter = (pageNumber) => {
       doc.setFontSize(10);
-      doc.text(`Página ${pageNumber}`, pageWidth / 2, doc.internal.pageSize.height - 10, {
-        align: "center",
-      });
+      doc.text(`Página ${pageNumber}`, pageWidth / 2, pageHeight - 10, { align: "center" });
     };
-
-    const tableColumn = [
-      "Cédula",
-      "Nombre",
-      "Apellido Paterno",
-      "Apellido Materno",
-      "Cantidad de Préstamos",
-      "Monto Total",
-    ];
+  
+    // Encabezados de la tabla
+    const tableColumn = ["Estado", "Cantidad de Préstamos"];
     const tableRows = [];
-
-    solicitudes.forEach((solicitud) => {
-      const row = [
-        solicitud.Cedula,
-        solicitud.Nombre,
-        solicitud.Primer_Apellido,
-        solicitud.Segundo_Apellido,
-        solicitud.Cantidad_Prestamos,
-        solicitud.Monto_Total,
-      ];
+  
+    // Datos de la tabla
+    prestamos.forEach((prestamo) => {
+      const row = [prestamo.Estado, prestamo.CantidadPrestamos];
       tableRows.push(row);
     });
-
+  
     addHeader();
-
+  
     doc.autoTable({
       head: [tableColumn],
       body: tableRows,
-      startY: 40,
+      startY: 40, // Espacio debajo del encabezado
       styles: {
         fontSize: 10,
         cellPadding: 5,
         overflow: "linebreak",
-        halign: "center",
+        halign: "center", // Centra el texto de las celdas
         valign: "middle",
       },
       headStyles: {
-        fillColor: [0, 150, 136],
+        fillColor: [0, 150, 136], // Color verde para el encabezado
         textColor: 255,
         fontSize: 12,
         fontStyle: "bold",
+        halign: "center",
       },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245], // Fondo gris claro para filas alternas
+      },
+      margin: { top: 50 }, // Márgenes para la tabla
       didDrawPage: (data) => {
         addFooter(doc.internal.getNumberOfPages());
       },
     });
-
-    doc.save("Reporte_Solicitudes_Prestamos.pdf");
+  
+    doc.save("Reporte_Prestamos.pdf");
   };
+  
+  
 
   return (
     <div className="container mx-auto p-6">
       <Card>
         <h2 className="text-2xl font-bold text-center text-teal-700 mb-6">
-          Reporte de Solicitudes de Préstamos
+          Reporte de Préstamos
         </h2>
 
         {/* Filtros y Botones */}
@@ -203,17 +179,17 @@ const ListaSolicitudesPrestamos = () => {
               label="Exportar a PDF"
               icon="pi pi-file-pdf"
               className="p-button-success"
-              onClick={generarPdfSolicitudes}
+              onClick={generarPdfPrestamos}
               disabled={!mostrarTabla}
             />
           </div>
         </div>
 
-        {/* Tabla de solicitudes */}
+        {/* Tabla de préstamos */}
         {mostrarTabla && (
           <div className="mt-8">
             <DataTable
-              value={solicitudes}
+              value={prestamos}
               paginator
               rows={5}
               loading={loading}
@@ -221,22 +197,30 @@ const ListaSolicitudesPrestamos = () => {
               showGridlines
               stripedRows
               responsiveLayout="scroll"
-              emptyMessage="No se encontraron solicitudes de préstamos"
+              emptyMessage="No se encontraron préstamos"
               style={{
                 "--primary-color": "#00695c",
                 "--primary-light-color": "#4db6ac",
               }}
             >
-              <Column field="Cedula" header="Cédula" sortable />
-              <Column field="Nombre" header="Nombre" sortable />
-              <Column field="Primer_Apellido" header="Apellido Paterno" sortable />
-              <Column field="Segundo_Apellido" header="Apellido Materno" sortable />
               <Column
-                field="Cantidad_Prestamos"
+                field="Estado"
+                header="Estado"
+                sortable
+                style={{
+                  color: "#00695c",
+                  fontWeight: 600,
+                }}
+              />
+              <Column
+                field="CantidadPrestamos"
                 header="Cantidad de Préstamos"
                 sortable
+                style={{
+                  color: "#00695c",
+                  fontWeight: 500,
+                }}
               />
-              <Column field="Monto_Total" header="Monto Total" sortable />
             </DataTable>
           </div>
         )}
@@ -245,4 +229,4 @@ const ListaSolicitudesPrestamos = () => {
   );
 };
 
-export default ListaSolicitudesPrestamos;
+export default ListaPrestamos;

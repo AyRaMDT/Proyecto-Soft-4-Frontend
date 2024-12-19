@@ -19,12 +19,10 @@ const Login = () => {
       
         try {
           const result = await IniciarSesion(cedula, password);
-          console.log(result);
           
-          alert(result.mensaje);       
-          if (result.rol === "cliente") {
+          if (result?.rol === "cliente") {
             navigate("/");
-          } else if (result.rol === "analista") {
+          } else if (result?.rol === "analista") {
             navigate("/InicioAnalistas");
           }
         } catch (err) {

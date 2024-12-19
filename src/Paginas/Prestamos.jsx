@@ -50,7 +50,8 @@ const Prestamos = () => {
         { label: 'Todos los Estados', value: 'TODOS' },
         { label: 'Activo', value: 'Activo' },
         { label: 'Pendiente', value: 'Pendiente' },
-        { label: 'Rechazado', value: 'Rechazado' }
+        { label: 'Rechazado', value: 'Rechazado' },
+        { label: 'Cancelado', value: 'Cancelado' }
     ];
 
     const filteredPrestamos = useMemo(() => {
@@ -93,27 +94,28 @@ const Prestamos = () => {
         return (
             <div className="actions-container">
     <Button
-        icon={rowData.estadoPrestamo?.match(/^Aprobado$/) ? "pi pi-check" : "pi pi-ban"}
+        icon={rowData.estadoPrestamo?.match(/^Activo$/) ? "pi pi-check" : "pi pi-ban"}
         className={`p-button-rounded ${
-            rowData.estadoPrestamo?.match(/^Aprobado$/)
+            rowData.estadoPrestamo?.match(/^Activo$/)
                 ? "custom-button-success"
                 : "custom-button-danger"
         }`}
         tooltip={
-            rowData.estadoPrestamo?.match(/^Aprobado$/)
+            rowData.estadoPrestamo?.match(/^Activo$/)
                 ? "Pagar"
                 : "No disponible para pagar"
         }
         onClick={() => 
-            rowData.estadoPrestamo?.match(/^Aprobado$/) &&
+            rowData.estadoPrestamo?.match(/^Activo$/) &&
             navigate('/RealizarPago', { state: { rowData } })
         }
-        disabled={!rowData.estadoPrestamo?.match(/^Aprobado$/)}
+        disabled={!rowData.estadoPrestamo?.match(/^Activo$/)}
     />
 </div>
 
         );
     };
+    
     
 
     const tableHeader = (

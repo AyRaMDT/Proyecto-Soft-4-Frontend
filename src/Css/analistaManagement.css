@@ -8,7 +8,6 @@
     min-height: 65vh;
     max-width: 1500px;
     margin: 78px auto 85px;
-    padding: 20px;
     background-color: var(--background-color);
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -150,6 +149,17 @@
   .btn-info:hover {
     background-color: #3b82f6; 
     border-color: #3b82f6;
+  }
+  
+.btn-pagar{
+    background-color: #359e61 !important;
+    border-color: #0D9488 !important;
+    color: #fff;
+
+  }
+  .btn-pagar:hover {
+    background-color: #359e61e5 !important;
+    border-color: #0F766E !important;
   }
   
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; 
+import React, { useState, useEffect, useRef } from 'react';
 import '../Css/registroPrestamo.css';
 import axios from 'axios';
 import { Toast } from 'primereact/toast';
@@ -8,7 +8,7 @@ import { insertarPago } from '../api/RegistrarPago.api';
 
 
 const RealizarPago = () => {
-  
+
   const [formData, setFormData] = useState({
     fechaPago: '',
     montoPagado: '',
@@ -23,133 +23,159 @@ const RealizarPago = () => {
   const location = useLocation();
   const { rowData: prestamo } = location.state || {};
   const [nuevoSaldo, setNuevoSaldo] = useState();
-  const [interesesMoratorios, setInteresesMoratorios] = useState()
-  
+  const [tasaInteresMoratoria, setInteresesMoratorios] = useState()
+
   const [errors, setErrors] = useState({});
   const toast = useRef(null);
+  const { rowData } = location.state || {}; 
 
-  
+
   useEffect(() => {
-    if (prestamo) {
-        console.log('Prestamo:', prestamo);
+    const obtenerDatosPrestamo = async () => {
+      try {
+        if (prestamo.idPrestamos) {
+          // Obtener todos los préstamos
+          const response = await axios.get('http://localhost:3333/formalizacion/listarTODO');
+          console.log('Respuesta completa de la API:', response.data);
 
-        if (prestamo.monto && prestamo.PlazoMeses) {
-            const tasaInteresAnual = prestamo.tasaInteresAnual; // Porcentaje anual (ej. 12%)
-            const tasaInteresMoratoria = prestamo.tasaInteresMoratoria; // Porcentaje moratorio
-            const saldo = prestamo.saldo;
-            const diaPagoSeleccionado = parseInt(prestamo.diaPago);
-            const diaActual = new Date().getDate();
-            
-            // Calcular la tasa mensual
-            const tasaMensual = (tasaInteresAnual / 100) / 12;
+          // Filtrar el préstamo por ID
+          const prestamoSeleccionado = response.data?.data?.find(
+            (item) => item.idPrestamos === prestamo.idPrestamos
+          );
 
-            // Cuota mensual (solo amortización)
-            
-            // Intereses mensuales normales
-            const interesMensual = (saldo * tasaMensual).toFixed(2);
-            
-            // Intereses moratorios (aplicados solo si hay retraso)
-            const interesesMoratorios = diaActual > diaPagoSeleccionado
-            ? (saldo * (tasaInteresMoratoria / 100)).toFixed(2)
-                : 0;
-                
-                // Total de intereses (mensual + moratorio)
-                const intereses = (
-                  (prestamo.tasaInteresAnual / 100 / 12) + 
-                  (diaActual > diaPagoSeleccionado ? prestamo.tasaInteresMoratoria / 100 : 0)
-                ).toFixed(2);
-                
+          if (prestamoSeleccionado) {
+            console.log('Préstamo seleccionado:', prestamoSeleccionado);
+            const cuota = prestamoSeleccionado.prestamoClienteCuota || '0';
 
-            const amortizacion = parseFloat((prestamo.monto / prestamo.PlazoMeses).toFixed(2));
-
-            console.log(intereses)
-            // Calcular el interés general sobre la amortización
-            const interesGeneral = parseFloat(amortizacion * intereses);
-
-            // Sumar el interés general a la amortización
-            const cuotaPago = parseFloat((amortizacion + interesGeneral).toFixed(2));
-            
-
-            // Actualizar estado
+            // Actualizar el estado con los datos correctos
             setFormData((prevState) => ({
-                ...prevState,
-                montoPagado: cuotaPago,
-                intereses: intereses * 100, // % intereses mensuales
-                amortizacion: amortizacion,
-                cuotaPago,
-                idPrestamos: prestamo.idPrestamos
+              ...prevState,
+              cuotaPago: cuota,
+              amortizacion: cuota,
+              idPrestamos: prestamoSeleccionado.idPrestamos,
+              montoPagado: cuota,
+              intereses: prestamo.intereses || '0.00', // Reemplaza valores vacíos por 0.00
+              tasaInteresMoratoria: prestamoSeleccionado.tasaInteresMoratoria || '0.00', // Nueva asignación
             }));
-
-            if (diaActual > diaPagoSeleccionado) {
-              setInteresesMoratorios(tasaInteresMoratoria);
-            } else {
-              setInteresesMoratorios(0);
-            }
-            
+          } else {
+            console.warn('No se encontró el préstamo correspondiente.');
+            toast.current.show({
+              severity: 'warn',
+              summary: 'Advertencia',
+              detail: 'Préstamo no encontrado en la base de datos.',
+              life: 3000,
+            });
+          }
         }
-    }
-}, [prestamo]);
+      } catch (error) {
+        console.error('Error al obtener los datos del préstamo:', error);
+        toast.current.show({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudo obtener la información del préstamo.',
+          life: 3000,
+        });
+      }
+    };
+
+    obtenerDatosPrestamo();
+  }, [prestamo]);
 
 
 
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
-
-
-   const validateForm = () => {
-    const newErrors = {};
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Enviando formulario...");  // Agrega esta línea para verificar
+    const resultadoValidacion = validarNumeroPagos(
+      formData.numeroPagos,
+      parseFloat(formData.cuotaPago) / formData.numeroPagos, // Cuota individual
+      parseFloat(formData.saldo)
+  );
 
-    if (validateForm()) {
-      try {
-       const { diaPago, ...formDataToSend } = formData;
+    // Validar y limpiar datos
+    const formDataToSend = {
+      ...formData,
+      intereses: formData.intereses && formData.intereses !== '' ? formData.intereses : '0.00',
+      amortizacion: formData.amortizacion && formData.amortizacion !== '' ? formData.amortizacion : '0.00',
+      cuotaPago: formData.cuotaPago && formData.cuotaPago !== '' ? formData.cuotaPago : '0.00',
+    };
 
-      const PagoNuevo = {
-      ...formDataToSend,
-      };
-  
-        console.log('Datos enviados al backend:', PagoNuevo);
-  
-        const resultado = await insertarPago(PagoNuevo);
-  
-        console.log("Pago realizado exitosamente:", resultado);
-        toast.current.show({ severity: 'success', summary: 'Exitoso', detail: 'Pago realizado de manera exitosa', life: 3000 });
-      } catch (error) {
-        console.error("Error al realizar el pago:", error);
-        toast.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un problema al realizar el pago', life: 3000 });
-      }
+    console.log("Enviando formulario con datos:", formDataToSend);
+
+    try {
+      const resultado = await insertarPago(formDataToSend);
+      console.log("Pago realizado exitosamente:", resultado);
+      toast.current.show({ severity: 'success', summary: 'Éxito', detail: 'Pago realizado correctamente.', life: 3000 });
+    } catch (error) {
+      console.error("Error al realizar el pago:", error);
+      toast.current.show({ severity: 'error', summary: 'Error', detail: 'Hubo un problema al realizar el pago.', life: 3000 });
     }
   };
-  
+
+  const validarNumeroPagos = (numeroPagos, cuotaPago, saldo) => {
+    if (numeroPagos <= 0) {
+        return { esValido: false, mensaje: 'El número de pagos no puede ser negativo o cero.' };
+    }
+
+    const amortizacionTotal = numeroPagos * cuotaPago;
+
+    if (amortizacionTotal > saldo) {
+        return { esValido: false, mensaje: 'La amortización total no puede exceder el saldo pendiente.' };
+    }
+
+    return { esValido: true };
+};
+
+const handleNumeroPagosChange = (e) => {
+  const nuevoNumeroPagos = parseInt(e.target.value, 10) || 1;
+
+  // Validar el nuevo número de pagos usando formData
+  const resultadoValidacion = validarNumeroPagos(
+      nuevoNumeroPagos,
+      parseFloat(formData.cuotaPago) / formData.numeroPagos, // Cuota individual
+      parseFloat(prestamo.saldo || 0) // Usa el saldo del préstamo
+  );
+
+  if (!resultadoValidacion.esValido) {
+      toast.current.show({
+          severity: 'warn',
+          summary: 'Advertencia',
+          detail: resultadoValidacion.mensaje,
+          life: 3000
+      });
+      return;
+  }
+
+  // Actualizar el estado con los nuevos valores
+  const nuevaCuotaTotal = parseFloat(formData.cuotaPago) / formData.numeroPagos * nuevoNumeroPagos;
+
+  setFormData((prevState) => ({
+      ...prevState,
+      numeroPagos: nuevoNumeroPagos,
+      cuotaPago: nuevaCuotaTotal.toFixed(2), // Actualiza cuota total
+      amortizacion: nuevaCuotaTotal.toFixed(2), // Amortización también
+  }));
+};
+
+
+
   useEffect(() => {
     const obtenerFechaLocal = () => {
-        const hoy = new Date();
-        const anio = hoy.getFullYear();
-        const mes = String(hoy.getMonth() + 1).padStart(2, "0"); 
-        const dia = String(hoy.getDate()).padStart(2, "0");
+      const hoy = new Date();
+      const anio = hoy.getFullYear();
+      const mes = String(hoy.getMonth() + 1).padStart(2, "0");
+      const dia = String(hoy.getDate()).padStart(2, "0");
 
-        return `${anio}-${mes}-${dia}`;
+      return `${anio}-${mes}-${dia}`;
     };
 
     const today = obtenerFechaLocal();
 
     setFormData((prevState) => ({
-        ...prevState,
-        fechaPago: today,
+      ...prevState,
+      fechaPago: today,
     }));
-}, []);
+  }, []);
 
 
   return (
@@ -167,7 +193,6 @@ const RealizarPago = () => {
                   id="numeroPrestamo"
                   name="numeroPrestamo"
                   value={prestamo.numeroPrestamo}
-                  onChange={handleChange}
                   className="form-input"
                   placeholder="Número de préstamo generado"
                   disabled
@@ -187,7 +212,7 @@ const RealizarPago = () => {
                 />
                 {errors.monto && <p className="error-message">{errors.monto}</p>}
               </div>
-              
+
               {/* Saldo Pendiente */}
               <div>
                 <label htmlFor="saldo" className="form-label">Saldo Pendiente</label>
@@ -195,7 +220,7 @@ const RealizarPago = () => {
                   type="text"
                   id="saldo"
                   name="saldo"
-                    value={prestamo.saldo}
+                  value={prestamo.saldo}
                   className="form-input"
                   disabled
                 />
@@ -213,7 +238,7 @@ const RealizarPago = () => {
                   className="form-input"
                   disabled
                 />
-                  
+
                 {errors.plazoMeses && <p className="error-message">{errors.plazoMeses}</p>}
               </div>
 
@@ -230,7 +255,7 @@ const RealizarPago = () => {
                 />
                 {errors.diaPago && <p className="error-message">{errors.diaPago}</p>}
               </div>
-              
+
 
               {/* Interes */}
               <div>
@@ -247,16 +272,17 @@ const RealizarPago = () => {
 
               {/* Interes Moratorios*/}
               <div>
-                <label htmlFor="interesesMoratorios" className="form-label">Interés moratorio</label>
+                <label htmlFor="tasaInteresMoratoria" className="form-label">Interés moratorio</label>
                 <input
                   type="text"
-                  id="interesesMoratorios"
-                  name="interesesMoratorios"
-                  value={interesesMoratorios + '%'}
+                  id="tasaInteresMoratoria"
+                  name="tasaInteresMoratoria"
+                  value={formData.tasaInteresMoratoria + '%'} // Accede desde formData
                   className="form-input"
                   disabled
                 />
               </div>
+
 
 
               {/* Amortizacion */}
@@ -266,8 +292,8 @@ const RealizarPago = () => {
                   type="number"
                   id="amortizacion"
                   name="amortizacion"
-                  value={formData.amortizacion}
-                  onChange={handleChange}
+                  value={formData.cuotaPago}
+
                   className="form-input"
                 />
                 {errors.amortizacion && <p className="error-message">{errors.amortizacion}</p>}
@@ -283,7 +309,7 @@ const RealizarPago = () => {
                   value={formData.cuotaPago}
                   className="form-input"
                   disabled
-                  onChange={handleChange}
+
 
                 />
                 {errors.clientesPersonaCedula && <p className="error-message">{errors.clientesPersonaCedula}</p>}
@@ -303,31 +329,31 @@ const RealizarPago = () => {
                 {errors.fechaInicio && <p className="error-message">{errors.fechaInicio}</p>}
               </div>
 
-              {/* ID Cliente */}
               <div>
-                <label htmlFor="numPagos" className="form-label">Número de pagos</label>
-                <input
-                  type="text"
-                  id="numPagos"
-                  name="numPagos"
-                  value={formData.numeroPagos} // Aquí debe aparecer el idCliente (si existe)
-                  className="form-input"
-                  disabled
-                  onChange={handleChange}
-                />
-                {errors.IdClientes && <p className="error-message">{errors.IdClientes}</p>}
-              </div>
-              
+    <label htmlFor="numeroPagos" className="form-label">Número de Pagos</label>
+    <input
+        type="number"
+        id="numeroPagos"
+        name="numeroPagos"
+        value={formData.numeroPagos}
+        min="1"
+        onChange={(e) => handleNumeroPagosChange(e, rowData)}
+        className="form-input"
+    />
+</div>
+
+
+
             </div>
 
-          
+
             {/* Botón de envío */}
             <div className="submit-button-container">
               <button
                 type="submit"
                 className="submit-button"
               >
-                  Realizar Pago
+                Realizar Pago
               </button>
             </div>
           </form>
