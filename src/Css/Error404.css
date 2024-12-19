@@ -1,0 +1,25 @@
+.error-container {
+    background-image: url('/img/404.png'); /* Ruta absoluta desde public */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .error-content {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  h1 {
+    font-size: 4rem;
+  }
+  
+  p {
+    font-size: 1.5rem;
+  }
+  

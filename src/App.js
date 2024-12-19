@@ -23,6 +23,7 @@ import Footer from './componentes/Footer';
 import Prestamos from './Paginas/Prestamos';
 import RealizarPago from './Paginas/RealizarPago';
 import Pagos from './Paginas/Pagos';
+import Error404 from './Paginas/error404'; 
 import ProtectedRoute from './ProtectedRoute';
 import { AuthProvider } from './context/authContext';
 
@@ -65,6 +66,7 @@ const App = () => {
             <Route path="/cobro-pagos" element={<CobroPagos />} />
             <Route path="/Solicitudesporfecha" element={<Solicitudesporfecha />} />
             <Route path="/Reportes" element={<Reportes />} />
+            <Route path='*' element={<Error404/>} />
           </Route>
         </Routes>
         <Footer />

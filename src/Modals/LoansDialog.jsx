@@ -113,9 +113,11 @@ const LoansDialog = ({ visible, loans, hideDialog, onEditLoan, onDeleteLoan }) =
                                             <span className="loan-number">Préstamo #{loan.numeroPrestamo}</span>
                                             <span
                                                 className={`loan-status ${loan.estadoPrestamo === 1
-                                                        ? 'activo'
-                                                        : loan.estadoPrestamo === 2
-                                                            ? 'pendiente'
+                                                    ? 'activo'
+                                                    : loan.estadoPrestamo === 2
+                                                        ? 'pendiente'
+                                                        : loan.estadoPrestamo === 3
+                                                            ? 'cancelado'
                                                             : loan.estadoPrestamo === 4
                                                                 ? 'rechazado'
                                                                 : ''
@@ -123,11 +125,13 @@ const LoansDialog = ({ visible, loans, hideDialog, onEditLoan, onDeleteLoan }) =
                                             >
                                                 {loan.estadoPrestamo === 1
                                                     ? 'Activo'
-                                                    : loan.estadoPrestamo === 2
-                                                        ? 'Pendiente'
-                                                        : loan.estadoPrestamo === 4
-                                                            ? 'Rechazado'
-                                                            : ''}
+                                                    : loan.estadoPrestamo === 3
+                                                        ? 'Cancelado'
+                                                        : loan.estadoPrestamo === 2
+                                                            ? 'Pendiente'
+                                                            : loan.estadoPrestamo === 4
+                                                                ? 'Rechazado'
+                                                                : ''}
                                             </span>
                                         </div>
 
